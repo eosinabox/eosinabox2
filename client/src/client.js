@@ -90,8 +90,8 @@ $(() => {
     // const credentialId = authData.slice( 55, 55 + credentialIdLength); // get the credential ID
     // const publicKeyBytes = authData.slice( 55 + credentialIdLength ); // get the public key object
     // const publicKeyObject = CBOR.decode( publicKeyBytes.buffer ); // the publicKeyBytes are encoded again as CBOR
-    consoleLog('AMIHDEBUG credForServer:', credForServer );
-    consoleLog('AMIHDEBUG credForServer [PUB-KEY???]:', credential.getPublicKey() );
+    consoleLog({ msg: 'AMIHDEBUG credForServer:', credForServer });
+    consoleLog({ msg: 'AMIHDEBUG credForServer [PUB-KEY???]:', pubkey: credential.getPublicKey() });
     fetch('/getNewPubKey', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
