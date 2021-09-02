@@ -43,8 +43,8 @@ $(() => {
     event.preventDefault();
     const randomStringFromServer = 'sadfjhkjwebrkbwfekjbf'; // AMIHDEBUG TODO: generate random string on server and manage it in a session
     const rp = {
-      name: "Duo Security",
-      id: "localhost",
+      name: "Ami Heines",
+      id: "amiheines.com",
     };
     const publicKeyCredentialCreationOptions = {
       challenge: Uint8Array.from( randomStringFromServer, c => c.charCodeAt(0) ),
@@ -57,7 +57,7 @@ $(() => {
       },
       pubKeyCredParams: [{alg: -7, type: "public-key"}],
       authenticatorSelection: {
-        authenticatorAttachment: "cross-platform", // cross-platform or platform or comment out for both
+        authenticatorAttachment: "platform", // cross-platform or platform or comment out for both
         // warning: we want to require AttestationFlags.attestedCredentialPresent - only works with platform
       },
       timeout: 60000,
@@ -66,6 +66,7 @@ $(() => {
     const credential = await navigator.credentials.create({
         publicKey: publicKeyCredentialCreationOptions
     });
+    console.log('credential', credential);
     /////////////////////////////////////////
     // take the credentials and make an object to send to the server!
     // helper: eosjs_serialize.arrayToHex([12,32,11])
@@ -89,7 +90,8 @@ $(() => {
     // const credentialId = authData.slice( 55, 55 + credentialIdLength); // get the credential ID
     // const publicKeyBytes = authData.slice( 55 + credentialIdLength ); // get the public key object
     // const publicKeyObject = CBOR.decode( publicKeyBytes.buffer ); // the publicKeyBytes are encoded again as CBOR
-    // console.log('AMIHDEBUG credForServer:', credForServer );
+    consoleLog('AMIHDEBUG credForServer:', credForServer );
+    consoleLog('AMIHDEBUG credForServer [PUB-KEY???]:', credential.getPublicKey() );
     fetch('/getNewPubKey', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,8 +104,3 @@ $(() => {
     });
   });
 });
-
-// body: JSON.stringify({
-//   consoleLog: 'earlier logging, easier logging...',
-//   accountName
-// })
