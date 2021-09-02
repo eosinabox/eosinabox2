@@ -19,6 +19,13 @@
     <!-- MDB core JavaScript -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
     <script src="client/src/client.js?123"></script>
+    <script src="client/src/cbor.js" type="text/javascript"></script>
+    <!-- https://github.com/EOSIO/eosjs/blob/master/docs/basic-usage/00_browser.md -->
+    <script src='client/src/eosjs/dist-web/externals.min.js'></script>
+    <script src='client/src/eosjs/dist-web/eosjs-api.min.js'></script>
+    <script src='client/src/eosjs/dist-web/eosjs-jsonrpc.min.js'></script>
+    <script src='client/src/eosjs/dist-web/eosjs-jssig.min.js'></script>
+    <script src='client/src/eosjs/dist-web/eosjs-serialize.min.js'></script>
     <style>
       .eosinabox_help_header {
         color: blue;
@@ -95,6 +102,7 @@
           You must enter a 12 character account name using a-z or 1-5 characters
         </div>
         <button id="esinabox_check_availability" class="btn btn-primary btn-sm" type="submit">Check availability</button>
+        <button id="eosinbox_createKeys" class="btn btn-primary btn-sm" type="submit">Create keys</button>
       </form>
     </div>
   </body>
