@@ -54,7 +54,8 @@ app.post("/getNewPubKey", async (req, res) => {
     // console.log(att);
     // console.log(Serialize.arrayToHex(new Uint8Array(att.authData.buffer)));
     const data = new DataView(att.authData.buffer);
-    let pos = 30;   // skip unknown
+    // let pos = 30;   // skip unknown
+    let pos = 0;   // NO SKIPPING?!??!?!!? https://www.w3.org/TR/webauthn/#sctn-attestation
     pos += 32;      // RP ID hash
     const flags = data.getUint8(pos++);
     const signCount = data.getUint32(pos);
