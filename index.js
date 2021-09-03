@@ -36,87 +36,105 @@ app.post("/consoleLog", (req, res) => {
 });
 app.post("/getNewPubKey", async (req, res) => {
   try {
-    console.log('[AMIHDEBUG] [POST][getNewPubKey]:::', JSON.stringify(req.body, null, 2));
-    // req.body.rpid
-    // req.body.id
-    // req.body.attestationObject
-    // req.body.clientDataJSON
-    var AttestationFlags;
-    (function (AttestationFlags) {
-      AttestationFlags[AttestationFlags["userPresent"] = 0x01] = "userPresent";
-      AttestationFlags[AttestationFlags["userVerified"] = 0x04] = "userVerified";
-      AttestationFlags[AttestationFlags["attestedCredentialPresent"] = 0x40] = "attestedCredentialPresent";
-      AttestationFlags[AttestationFlags["extensionDataPresent"] = 0x80] = "extensionDataPresent";
-    })(AttestationFlags || (AttestationFlags = {}));
     const k = req.body;
+    console.log('AMIHDEBUG getNewPubKey [0] k.rpid:', k.rpid);
+    console.log('AMIHDEBUG getNewPubKey [0] k.id:', k.id);
+    console.log('AMIHDEBUG getNewPubKey [0] k.attestationObject.substr(0,80):', k.attestationObject.substr(0,80));
+    console.log('AMIHDEBUG getNewPubKey [0] k.clientDataJSON.substr(0,80):', k.clientDataJSON.substr(0,80));
+    // // decode the clientDataJSON into a utf-8 string
+    const utf8Decoder = new TextDecoder('utf-8');
+    const decodedClientData = utf8Decoder.decode( Serialize.hexToUint8Array(k.clientDataJSON) );
+    const clientDataObj = JSON.parse(decodedClientData);
+    console.log('AMIHDEBUG getNewPubKey [1] clientDataObj:', clientDataObj);
+    const decodedAttestationObj = cbor.decode( k.attestationObject );
+    console.log('AMIHDEBUG getNewPubKey [2] attestationObj:', decodedAttestationObj );
+    // const {authData} = decodedAttestationObj;
+    // // get the length of the credential ID
+    // const dataView = new DataView( new ArrayBuffer(2) );
+    // const idLenBytes = authData.slice(53, 55);
+    // idLenBytes.forEach( (value, index) => dataView.setUint8( index, value ) );
+    // const credentialIdLength = dataView.getUint16();
+    // const credentialId = authData.slice( 55, 55 + credentialIdLength); // get the credential ID
+    // const publicKeyBytes = authData.slice( 55 + credentialIdLength ); // get the public key object
+    // const publicKeyObject = CBOR.decode( publicKeyBytes.buffer ); // the publicKeyBytes are encoded again as CBOR
+    // consoleLog({ msg: 'AMIHDEBUG credForServer:', credForServer });
+
     ////////////////////////////////////////////////////////////////////////////////
-    const att = await cbor.decodeFirst(Serialize.hexToUint8Array(k.attestationObject));
-    // console.log(att);
-    // console.log(Serialize.arrayToHex(new Uint8Array(att.authData.buffer)));
-    const data = new DataView(att.authData.buffer);
-    // let pos = 30;   // skip unknown
-    let pos = 0;   // NO SKIPPING?!??!?!!? https://www.w3.org/TR/webauthn/#sctn-attestation
-    pos += 32;      // RP ID hash
-    const flags = data.getUint8(pos++);
-    const signCount = data.getUint32(pos);
-    pos += 4;
-    console.log({ msg: 'amihdebug [0]', flags, paaram: AttestationFlags.attestedCredentialPresent });
-    console.log({ msg: 'amihdebug [1]', boolNeg: !(flags & AttestationFlags.attestedCredentialPresent) });
-    //
-    // HOW RISKY IS DISABLING THIS??
-    // Perhaps not risky at all? not sure. I want the biometrics to work, not a yubikey touch
-    // the yubikey can be touched by anyone - no fingrpring...
-    // ALSO: disabling this "throw" messes up the rest of the code, especially the
-    // > const credentialId = new Uint8Array(data.buffer, pos, credentialIdLength);
-    // --> RangeError: Invalid typed array length: 53043
-    //
-    // probably no way around it, can't proceed with a yubikey on my laptop and developing on localhost.
-    // will have to continue developing on a remte server with ssh and nginx and a proper ssl cert
-    //
-    if (!(flags & AttestationFlags.attestedCredentialPresent)) {
-      console.log('attestedCredentialPresent flag not set!!!');
-      throw new Error('attestedCredentialPresent flag not set');
-    }
-    const aaguid = Serialize.arrayToHex(new Uint8Array(data.buffer, pos, 16));
-    pos += 16;
-    const credentialIdLength = data.getUint16(pos);
-    pos += 2;
-    const credentialId = new Uint8Array(data.buffer, pos, credentialIdLength);
-    pos += credentialIdLength;
-    const pubKey = await cbor.decodeFirst(new Uint8Array(data.buffer, pos));
-    if (Serialize.arrayToHex(credentialId) !== k.id){
-      throw new Error('Credential ID does not match');
-    }
-    if (pubKey.get(1) !== 2){
-      throw new Error('Public key is not EC2');
-    }
-    if (pubKey.get(3) !== -7){
-      throw new Error('Public key is not ES256');
-    }
-    if (pubKey.get(-1) !== 1){
-      throw new Error('Public key has unsupported curve');
-    }
-    const x = pubKey.get(-2);
-    const y = pubKey.get(-3);
-    if (x.length !== 32 || y.length !== 32){
-      throw new Error('Public key has invalid X or Y size');
-    }
-    const ser = new Serialize.SerialBuffer({textEncoder: new util.TextEncoder(), textDecoder: new util.TextDecoder()});
-    ser.push((y[31] & 1) ? 3 : 2);
-    ser.pushArray(x);
-    ser.push(flagsToPresence(flags));
-    ser.pushString(k.rpid);
-    const compact = ser.asUint8Array();
-    const key = Numeric.publicKeyToString({
-        type: Numeric.KeyType.wa,
-        data: compact,
-    });
-    consoleLog(key)
+    // var AttestationFlags;
+    // (function (AttestationFlags) {
+    //   AttestationFlags[AttestationFlags["userPresent"] = 0x01] = "userPresent";
+    //   AttestationFlags[AttestationFlags["userVerified"] = 0x04] = "userVerified";
+    //   AttestationFlags[AttestationFlags["attestedCredentialPresent"] = 0x40] = "attestedCredentialPresent";
+    //   AttestationFlags[AttestationFlags["extensionDataPresent"] = 0x80] = "extensionDataPresent";
+    // })(AttestationFlags || (AttestationFlags = {}));
+    // const k = req.body;
+    // const att = await cbor.decodeFirst(Serialize.hexToUint8Array(k.attestationObject));
+    // // console.log(att);
+    // // console.log(Serialize.arrayToHex(new Uint8Array(att.authData.buffer)));
+    // const data = new DataView(att.authData.buffer);
+    // // let pos = 30;   // skip unknown
+    // let pos = 0;   // NO SKIPPING?!??!?!!? https://www.w3.org/TR/webauthn/#sctn-attestation
+    // pos += 32;      // RP ID hash
+    // const flags = data.getUint8(pos++);
+    // const signCount = data.getUint32(pos);
+    // pos += 4;
+    // console.log({ msg: 'amihdebug [0]', flags, paaram: AttestationFlags.attestedCredentialPresent });
+    // console.log({ msg: 'amihdebug [1]', boolNeg: !(flags & AttestationFlags.attestedCredentialPresent) });
+    // //
+    // // HOW RISKY IS DISABLING THIS??
+    // // Perhaps not risky at all? not sure. I want the biometrics to work, not a yubikey touch
+    // // the yubikey can be touched by anyone - no fingrpring...
+    // // ALSO: disabling this "throw" messes up the rest of the code, especially the
+    // // > const credentialId = new Uint8Array(data.buffer, pos, credentialIdLength);
+    // // --> RangeError: Invalid typed array length: 53043
+    // //
+    // // probably no way around it, can't proceed with a yubikey on my laptop and developing on localhost.
+    // // will have to continue developing on a remte server with ssh and nginx and a proper ssl cert
+    // //
+    // if (!(flags & AttestationFlags.attestedCredentialPresent)) {
+    //   console.log('attestedCredentialPresent flag not set!!!');
+    //   throw new Error('attestedCredentialPresent flag not set');
+    // }
+    // const aaguid = Serialize.arrayToHex(new Uint8Array(data.buffer, pos, 16));
+    // pos += 16;
+    // const credentialIdLength = data.getUint16(pos);
+    // pos += 2;
+    // const credentialId = new Uint8Array(data.buffer, pos, credentialIdLength);
+    // pos += credentialIdLength;
+    // const pubKey = await cbor.decodeFirst(new Uint8Array(data.buffer, pos));
+    // if (Serialize.arrayToHex(credentialId) !== k.id){
+    //   throw new Error('Credential ID does not match');
+    // }
+    // if (pubKey.get(1) !== 2){
+    //   throw new Error('Public key is not EC2');
+    // }
+    // if (pubKey.get(3) !== -7){
+    //   throw new Error('Public key is not ES256');
+    // }
+    // if (pubKey.get(-1) !== 1){
+    //   throw new Error('Public key has unsupported curve');
+    // }
+    // const x = pubKey.get(-2);
+    // const y = pubKey.get(-3);
+    // if (x.length !== 32 || y.length !== 32){
+    //   throw new Error('Public key has invalid X or Y size');
+    // }
+    // const ser = new Serialize.SerialBuffer({textEncoder: new util.TextEncoder(), textDecoder: new util.TextDecoder()});
+    // ser.push((y[31] & 1) ? 3 : 2);
+    // ser.pushArray(x);
+    // ser.push(flagsToPresence(flags));
+    // ser.pushString(k.rpid);
+    // const compact = ser.asUint8Array();
+    // const key = Numeric.publicKeyToString({
+    //     type: Numeric.KeyType.wa,
+    //     data: compact,
+    // });
+    // consoleLog(key)
     ////////////////////////////////////////////////////////////////////////////////
-    res.status(200).send(key);
+    res.status(200).send('key');
   } catch (error) {
-    console.log('error in flags? user presence failed??', error)
-    res.status(200).send({ msg: 'user presence required' });
+    console.log('error in [getNewPubKey]', error)
+    res.status(200).send({ msg: 'error in getNewPubKey' });
   }
 });
 app.get("/", (req, res) => {
