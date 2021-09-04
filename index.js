@@ -4,9 +4,10 @@
 const express = require("express");
 const path = require("path");
 const cbor = require("cbor");
-const { Api, JsonRpc, Serialize } = require('eosjs');
+const { Api, JsonRpc, Serialize, Numeric } = require('eosjs');
 const fetch = require("node-fetch");
 const bodyParser = require('body-parser');
+
 /**
  * App Variables
  */
@@ -39,26 +40,68 @@ app.post("/getNewPubKey", async (req, res) => {
     const k = req.body;
     console.log('AMIHDEBUG getNewPubKey [0] k.rpid:', k.rpid);
     console.log('AMIHDEBUG getNewPubKey [0] k.id:', k.id);
-    console.log('AMIHDEBUG getNewPubKey [0] k.attestationObject.substr(0,80):', k.attestationObject.substr(0,80));
-    console.log('AMIHDEBUG getNewPubKey [0] k.clientDataJSON.substr(0,80):', k.clientDataJSON.substr(0,80));
+    console.log('AMIHDEBUG getNewPubKey [0] k.attestationObject.substr(0,80):', k.attestationObject.substr(0,180));
+    console.log('AMIHDEBUG getNewPubKey [0] k.clientDataJSON.substr(0,80):', k.clientDataJSON.substr(0,180));
     // // decode the clientDataJSON into a utf-8 string
+    // https://medium.com/webauthnworks/verifying-fido2-responses-4691288c8770
     const utf8Decoder = new TextDecoder('utf-8');
     const decodedClientData = utf8Decoder.decode( Serialize.hexToUint8Array(k.clientDataJSON) );
     const clientDataObj = JSON.parse(decodedClientData);
     console.log('AMIHDEBUG getNewPubKey [1] clientDataObj:', clientDataObj);
     const decodedAttestationObj = cbor.decode( k.attestationObject );
     console.log('AMIHDEBUG getNewPubKey [2] attestationObj:', decodedAttestationObj );
-    // const {authData} = decodedAttestationObj;
-    // // get the length of the credential ID
-    // const dataView = new DataView( new ArrayBuffer(2) );
-    // const idLenBytes = authData.slice(53, 55);
-    // idLenBytes.forEach( (value, index) => dataView.setUint8( index, value ) );
-    // const credentialIdLength = dataView.getUint16();
-    // const credentialId = authData.slice( 55, 55 + credentialIdLength); // get the credential ID
-    // const publicKeyBytes = authData.slice( 55 + credentialIdLength ); // get the public key object
-    // const publicKeyObject = CBOR.decode( publicKeyBytes.buffer ); // the publicKeyBytes are encoded again as CBOR
-    // consoleLog({ msg: 'AMIHDEBUG credForServer:', credForServer });
+    const {authData} = decodedAttestationObj;
 
+    // get the length of the credential ID
+    const dataView = new DataView( new ArrayBuffer(2) );
+    const idLenBytes = authData.slice(53, 55);
+    idLenBytes.forEach( (value, index) => dataView.setUint8( index, value ));
+    const credentialIdLength = dataView.getUint16();
+    const credentialId = authData.slice( 55, 55 + credentialIdLength); // get the credential ID
+    const publicKeyBytes = authData.slice( 55 + credentialIdLength ); // get the public key object
+    const pubKey = cbor.decode( publicKeyBytes); // the publicKeyBytes are encoded again as CBOR
+    console.log('AMIHDEBUG getNewPubKey [5] pubKey:', pubKey);
+    if (pubKey.get(1) !== 2){
+      throw new Error('Public key is not EC2');
+    }
+    if (pubKey.get(3) !== -7){
+      throw new Error('Public key is not ES256');
+    }
+    if (pubKey.get(-1) !== 1){
+      throw new Error('Public key has unsupported curve');
+    }
+    const x = pubKey.get(-2);
+    const y = pubKey.get(-3);
+    if (x.length !== 32 || y.length !== 32){
+      throw new Error('Public key has invalid X or Y size');
+    }
+    const ser = new Serialize.SerialBuffer({textEncoder: new TextEncoder(), textDecoder: new TextDecoder()});
+    ser.push((y[31] & 1) ? 3 : 2);
+    ser.pushArray(x);
+    //////////////////////////////////////////////////
+    // const enum UserPresence {
+    //   none = 0,
+    //   present = 1,
+    //   verified = 2,
+    // }
+    // function flagsToPresence(flags: number) {
+    //   if (flags & AttestationFlags.userVerified)
+    //     return UserPresence.verified;
+    //   else if (flags & AttestationFlags.userPresent)
+    //     return UserPresence.present;
+    //   else
+    //     return UserPresence.none;
+    // }
+    //////////////////////////////////////////////////
+    ser.push( 1); // should be flags to presence...
+    ser.pushString(k.rpid);
+    const compact = ser.asUint8Array();
+    const key = Numeric.publicKeyToString({
+        type: Numeric.KeyType.wa,
+        data: compact,
+    });
+    console.log('AMIHDEBUG [6] key: ', key)
+    res.status(200).send({pubkey: key});
     ////////////////////////////////////////////////////////////////////////////////
     // var AttestationFlags;
     // (function (AttestationFlags) {
@@ -131,7 +174,6 @@ app.post("/getNewPubKey", async (req, res) => {
     // });
     // consoleLog(key)
     ////////////////////////////////////////////////////////////////////////////////
-    res.status(200).send('key');
   } catch (error) {
     console.log('error in [getNewPubKey]', error)
     res.status(200).send({ msg: 'error in getNewPubKey' });

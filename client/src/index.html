@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>EOS in a Box</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <!-- Google Fonts -->
@@ -29,6 +31,9 @@
     <style>
       .eosinabox_help_header {
         color: blue;
+      }
+      .eosinabox_help {
+	display: none;
       }
     </style>
   </head>
@@ -98,6 +103,8 @@
           <option value="EOS" disabled>EOS (soon)</option>
         </select>
         <input id="eosinabox_accountName" type="text" class="form-control mb-4" placeholder="account name">
+	<div id="eosinabox_countAccountLen"></div>
+	<div id="eosinabox_pubkey"></div>
         <div class="invalid-feedback">
           You must enter a 12 character account name using a-z or 1-5 characters
         </div>

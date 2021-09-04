@@ -11,9 +11,21 @@ $(() => {
     consoleLog( { consoleLog: 'AMIHDEBUG toggle visibility?' });
     $('.eosinabox_help').toggle();
   })
+  $('#eosinabox_accountName').on('input', (e) => {
+    $('#eosinabox_accountName').val( $('#eosinabox_accountName').val().toLowerCase() );
+    const len = $('#eosinabox_accountName').val().length;
+    $('#eosinabox_countAccountLen').html( (12-len) + ' more characters' );
+    if(len == 12){
+      $('#eosinabox_countAccountLen').html('Checking if the account name is available...');
+      checkIfAccountNameIsAvailable();
+    }
+  });
   $('#esinabox_check_availability').on('click', (event)=>{
     event.preventDefault();
-    var accName = $('#eosinabox_accountName').val();
+    checkIfAccountNameIsAvailable();
+  })
+  const checkIfAccountNameIsAvailable = () => {
+    const accName = $('#eosinabox_accountName').val();
     if(accName.length != 12){
       alert(`Account name should be 12 characters long, it is ${accName.length}, try again`);
       consoleLog( { consoleLog: 'account length failed', accName });
@@ -37,8 +49,7 @@ $(() => {
     .catch((error) => {
       console.error('Error in FETCH:', error);
     });
-
-  })
+  }
   $('#eosinbox_createKeys').on('click', async (event) => {
     event.preventDefault();
     const randomStringFromServer = 'sadfjhkjwebrkbwfekjbf'; // AMIHDEBUG TODO: generate random string on server and manage it in a session
@@ -46,14 +57,15 @@ $(() => {
       name: "Ami Heines",
       id: "amiheines.com",
     };
+    const accName = $('#eosinabox_accountName').val();
     const publicKeyCredentialCreationOptions = {
       challenge: Uint8Array.from( randomStringFromServer, c => c.charCodeAt(0) ),
       rp: rp,
       user: {
         id: Uint8Array.from(
-          "UZSL85T9AFC", c => c.charCodeAt(0)),
-        name: "lee@webauthn.guide",
-        displayName: "Lee",
+          accName, c => c.charCodeAt(0)),
+        name: accName,
+        displayName: accName,
       },
       pubKeyCredParams: [{alg: -7, type: "public-key"}],
       authenticatorSelection: {
@@ -97,7 +109,11 @@ $(() => {
       body: JSON.stringify(credForServer)
     })
     .then(response => response.json())
-    .then(data => console.log('data: ', data))
+    .then(async data => {
+      console.log('AMIHDEBUG did we get back the Pubkey from the server?', data);
+      $('#eosinabox_pubkey').html(data.pubkey);
+      await consoleLog( data );
+    })
     .catch( err => {
       console.log('err', err);
     });
