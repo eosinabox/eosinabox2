@@ -32,7 +32,8 @@ app.get("/client/src/:filename", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
 });
 app.post("/consoleLog", (req, res) => {
-  console.log('[AMIHDEBUG] [POST][consoleLog]:::', JSON.stringify(req.body, null, 2));
+  console.log('[consoleLog]:::', JSON.stringify(req.body, null, 2));
+  console.log('[consoleLog][headers]:', JSON.stringify(req.headers, null, 2));
   res.status(200).send("ok");
 });
 app.post("/getNewPubKey", async (req, res) => {
