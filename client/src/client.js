@@ -6,6 +6,11 @@ const consoleLog = async (logObj) => {
   });
 }
 $(() => {
+  window.onerror = function errorHandler(msg, url, line) {
+    consoleLog(arguments);
+    // Just let default handler run.
+    return false;
+  }
   $('.eosinabox_help_header').on('click', ()=>{
     console.log('AMIHDEBUG toggle visibility?');
     consoleLog( { consoleLog: 'AMIHDEBUG toggle visibility?' });
@@ -14,37 +19,73 @@ $(() => {
   $('#eosinabox_accountName').on('input', (e) => {
     $('#eosinabox_accountName').val( $('#eosinabox_accountName').val().toLowerCase() );
     const len = $('#eosinabox_accountName').val().length;
+    if(len > 12){
+      $('#eosinabox_accountName').val( $('#eosinabox_accountName').val().substr(0,12) );
+      len = $('#eosinabox_accountName').val().length;
+    }
     $('#eosinabox_countAccountLen').html( (12-len) + ' more characters' );
     if(len == 12){
       $('#eosinabox_countAccountLen').html('Checking if the account name is available...');
-      checkIfAccountNameIsAvailable();
+      checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
+        if(res.accountAvailable){
+          // alert('Account is available');
+          $('#eosinabox_countAccountLen').html('Account is available');
+        }else{
+          // alert('Account is already taken, please try another name');
+          $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
+        }
+      });
     }
   });
   $('#esinabox_check_availability').on('click', (event)=>{
     event.preventDefault();
-    checkIfAccountNameIsAvailable();
-  })
-  const checkIfAccountNameIsAvailable = () => {
-    const accName = $('#eosinabox_accountName').val();
-    if(accName.length != 12){
-      alert(`Account name should be 12 characters long, it is ${accName.length}, try again`);
-      consoleLog( { consoleLog: 'account length failed', accName });
+    checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
+      if(res.accountAvailable){
+        // alert('Account is available');
+        $('#eosinabox_countAccountLen').html('Account is available');
+      }else{
+        // alert('Account is already taken, please try another name');
+        $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
+      }
+    });
+  });
+  $('#eosinabox_custodianAccountName').on('input', (e) => {
+    $('#eosinabox_custodianAccountName').val( $('#eosinabox_custodianAccountName').val().toLowerCase() );
+    const len = $('#eosinabox_custodianAccountName').val().length;
+    if(len > 12){
+      $('#eosinabox_custodianAccountName').val( $('#eosinabox_custodianAccountName').val().substr(0,12) );
+      len = $('#eosinabox_custodianAccountName').val().length;
+    }
+    $('#eosinabox_countCustodianAccountLen').html( (12-len) + ' more characters' );
+    if(len == 12){
+      $('#eosinabox_countCustodianAccountLen').html('Checking if the custodian account name exists...');
+      checkIfAccountNameIsAvailable( $('#eosinabox_custodianAccountName').val(), res => {
+        if(res.accountAvailable){
+          // alert('Custodian Account does not exist, please try again');
+          $('#eosinabox_countCustodianAccountLen').html('Custodian Account does not exist, please try again');
+        }else{
+          // alert('Custodian account found');
+          $('#eosinabox_countCustodianAccountLen').html('Custodian account found');
+        }
+      });
+    }
+  });
+  const checkIfAccountNameIsAvailable = (accToCheck, callback) => {
+    if(accToCheck.length != 12){
+      alert(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
+      consoleLog( { consoleLog: 'account length failed', accToCheck });
       return;
-    }else if(!/^[a-z1-5]{12}$/.test(accName)){
+    }else if(!/^[a-z1-5]{12}$/.test(accToCheck)){
       alert('The account name contains illegal characters. Characters should be in the range: a-z or 1-5, please fix and try again.');
-      consoleLog( { consoleLog: 'account validation failed', accName });
+      consoleLog( { consoleLog: 'account validation failed', accToCheck });
       return;
     }
-    consoleLog( { consoleLog: 'check if account name is available', accName });
-    fetch('/checkAvailability/' + accName)
+    consoleLog( { consoleLog: 'check if account name is available', accToCheck });
+    fetch('/checkAvailability/' + accToCheck)
     .then(response => response.json())
     .then(data => {
       console.log('AMIHDEBUG res--data::', data);
-      if(!!data.available){
-        alert('The account name is available!');
-      }else{
-        alert('The account name is unavailable, please try another account name.');
-      }
+      callback({ accountAvailable: !!data.available });
     })
     .catch((error) => {
       console.error('Error in FETCH:', error);
@@ -55,7 +96,7 @@ $(() => {
     const randomStringFromServer = 'sadfjhkjwebrkbwfekjbf'; // AMIHDEBUG TODO: generate random string on server and manage it in a session
     const rp = {
       name: "Ami Heines",
-      id: "amiheines.com",
+      id: "amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com
     };
     const accName = $('#eosinabox_accountName').val();
     const publicKeyCredentialCreationOptions = {
@@ -73,7 +114,8 @@ $(() => {
         // warning: we want to require AttestationFlags.attestedCredentialPresent - only works with platform
       },
       timeout: 60000,
-      attestation: "direct"
+      attestation: "none" // "direct" is not needed, why bother reading all the different types of attestations?
+      // the authData contains the pubKey and we will *maybe* check the attestation later, in a future version
     };
     const credential = await navigator.credentials.create({
         publicKey: publicKeyCredentialCreationOptions

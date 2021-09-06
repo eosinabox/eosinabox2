@@ -3,7 +3,8 @@
   <head>
     <title>EOS in a Box</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <!-- Google Fonts -->
@@ -34,6 +35,10 @@
       }
       .eosinabox_help {
 	display: none;
+      }
+      #eosinabox_pubkey {
+        border: 1px solid lightgray;
+        border-radius: 2px;
       }
     </style>
   </head>
@@ -101,14 +106,19 @@
         <select class="browser-default custom-select" name="blockchain" id="blockchain">
           <option value="Jungle3" selected>Jungle3 Test Net</option>
           <option value="EOS" disabled>EOS (soon)</option>
+          <option value="WAX" disabled>WAX (soon)</option>
+          <option value="Telos" disabled>Telos (soon)</option>
+          <option value="Proton" disabled>Proton (soon)</option>
+          <option value="FIO" disabled>FIO (soon)</option>
+          <option value="BOS" disabled>BOS (soon)</option>
+          <option value="Europechain" disabled>Europechain (soon)</option>
         </select>
         <input id="eosinabox_accountName" type="text" class="form-control mb-4" placeholder="account name">
 	<div id="eosinabox_countAccountLen"></div>
-	<div id="eosinabox_pubkey"></div>
-        <div class="invalid-feedback">
-          You must enter a 12 character account name using a-z or 1-5 characters
-        </div>
-        <button id="esinabox_check_availability" class="btn btn-primary btn-sm" type="submit">Check availability</button>
+        <input id="eosinabox_custodianAccountName" type="text" class="form-control mb-4" placeholder="custodian account name">
+	<div id="eosinabox_countCustodianAccountLen"></div>
+	<div id="eosinabox_pubkey" class="text-break"></div>
+        <!--button id="esinabox_check_availability" class="btn btn-primary btn-sm" type="submit">Check availability</button-->
         <button id="eosinbox_createKeys" class="btn btn-primary btn-sm" type="submit">Create keys</button>
       </form>
     </div>
