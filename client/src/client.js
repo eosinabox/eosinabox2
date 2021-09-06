@@ -1,3 +1,8 @@
+var gState = {
+  accountName: false,
+  custodianAccountName: false,
+  pubkey: false
+};
 const consoleLog = async (logObj) => {
   await fetch('/consoleLog', {
     method: 'POST',
@@ -29,12 +34,15 @@ $(() => {
       checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
         if(res.accountAvailable){
           // alert('Account is available');
+          gState.accountName = true;
           $('#eosinabox_countAccountLen').html('Account is available');
         }else{
           // alert('Account is already taken, please try another name');
+          gState.accountName = false;
           $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
         }
       });
+      checkIfAllConditionsMet();
     }
   });
   $('#esinabox_check_availability').on('click', (event)=>{
@@ -42,11 +50,14 @@ $(() => {
     checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
       if(res.accountAvailable){
         // alert('Account is available');
+        gState.accountName = true;
         $('#eosinabox_countAccountLen').html('Account is available');
       }else{
         // alert('Account is already taken, please try another name');
+        gState.accountName = false;
         $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
       }
+      checkIfAllConditionsMet();
     });
   });
   $('#eosinabox_custodianAccountName').on('input', (e) => {
@@ -62,14 +73,27 @@ $(() => {
       checkIfAccountNameIsAvailable( $('#eosinabox_custodianAccountName').val(), res => {
         if(res.accountAvailable){
           // alert('Custodian Account does not exist, please try again');
+          gState.custodianAccountName = false;
           $('#eosinabox_countCustodianAccountLen').html('Custodian Account does not exist, please try again');
         }else{
           // alert('Custodian account found');
+          gState.custodianAccountName = true;
           $('#eosinabox_countCustodianAccountLen').html('Custodian account found');
         }
+        checkIfAllConditionsMet();
       });
     }
   });
+  const checkIfAllConditionsMet = () => {
+    // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
+    if(gState.accountName && gState.custodianAccountName && gState.pubkey){
+      $('#eosinbox_createKeys' ).hide();
+      $('#eosinabox_prepareEsr').show();
+    }else{
+      $('#eosinbox_createKeys' ).show();
+      $('#eosinabox_prepareEsr').hide();
+    }
+  }
   const checkIfAccountNameIsAvailable = (accToCheck, callback) => {
     if(accToCheck.length != 12){
       alert(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
@@ -153,10 +177,14 @@ $(() => {
     .then(response => response.json())
     .then(async data => {
       console.log('AMIHDEBUG did we get back the Pubkey from the server?', data);
+      gState.pubkey = true;
       $('#eosinabox_pubkey').html(data.pubkey);
+      checkIfAllConditionsMet();
       await consoleLog( data );
     })
     .catch( err => {
+      gState.pubkey = false;
+      checkIfAllConditionsMet();
       consoleLog(err);
     });
   });
