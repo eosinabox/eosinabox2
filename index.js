@@ -7,7 +7,7 @@ const cbor = require("cbor");
 const { Api, JsonRpc, Serialize, Numeric } = require('eosjs');
 const fetch = require("node-fetch");
 const bodyParser = require('body-parser');
-
+const { SigningRequest } = require("eosio-signing-request");
 /**
  * App Variables
  */
@@ -106,74 +106,6 @@ app.post("/getNewPubKey", async (req, res) => {
     ////////////////////////////////////////////////////////////////////////////////
     // var AttestationFlags;
     // (function (AttestationFlags) {
-    //   AttestationFlags[AttestationFlags["userPresent"] = 0x01] = "userPresent";
-    //   AttestationFlags[AttestationFlags["userVerified"] = 0x04] = "userVerified";
-    //   AttestationFlags[AttestationFlags["attestedCredentialPresent"] = 0x40] = "attestedCredentialPresent";
-    //   AttestationFlags[AttestationFlags["extensionDataPresent"] = 0x80] = "extensionDataPresent";
-    // })(AttestationFlags || (AttestationFlags = {}));
-    // const k = req.body;
-    // const att = await cbor.decodeFirst(Serialize.hexToUint8Array(k.attestationObject));
-    // // console.log(att);
-    // // console.log(Serialize.arrayToHex(new Uint8Array(att.authData.buffer)));
-    // const data = new DataView(att.authData.buffer);
-    // // let pos = 30;   // skip unknown
-    // let pos = 0;   // NO SKIPPING?!??!?!!? https://www.w3.org/TR/webauthn/#sctn-attestation
-    // pos += 32;      // RP ID hash
-    // const flags = data.getUint8(pos++);
-    // const signCount = data.getUint32(pos);
-    // pos += 4;
-    // console.log({ msg: 'amihdebug [0]', flags, paaram: AttestationFlags.attestedCredentialPresent });
-    // console.log({ msg: 'amihdebug [1]', boolNeg: !(flags & AttestationFlags.attestedCredentialPresent) });
-    // //
-    // // HOW RISKY IS DISABLING THIS??
-    // // Perhaps not risky at all? not sure. I want the biometrics to work, not a yubikey touch
-    // // the yubikey can be touched by anyone - no fingrpring...
-    // // ALSO: disabling this "throw" messes up the rest of the code, especially the
-    // // > const credentialId = new Uint8Array(data.buffer, pos, credentialIdLength);
-    // // --> RangeError: Invalid typed array length: 53043
-    // //
-    // // probably no way around it, can't proceed with a yubikey on my laptop and developing on localhost.
-    // // will have to continue developing on a remte server with ssh and nginx and a proper ssl cert
-    // //
-    // if (!(flags & AttestationFlags.attestedCredentialPresent)) {
-    //   console.log('attestedCredentialPresent flag not set!!!');
-    //   throw new Error('attestedCredentialPresent flag not set');
-    // }
-    // const aaguid = Serialize.arrayToHex(new Uint8Array(data.buffer, pos, 16));
-    // pos += 16;
-    // const credentialIdLength = data.getUint16(pos);
-    // pos += 2;
-    // const credentialId = new Uint8Array(data.buffer, pos, credentialIdLength);
-    // pos += credentialIdLength;
-    // const pubKey = await cbor.decodeFirst(new Uint8Array(data.buffer, pos));
-    // if (Serialize.arrayToHex(credentialId) !== k.id){
-    //   throw new Error('Credential ID does not match');
-    // }
-    // if (pubKey.get(1) !== 2){
-    //   throw new Error('Public key is not EC2');
-    // }
-    // if (pubKey.get(3) !== -7){
-    //   throw new Error('Public key is not ES256');
-    // }
-    // if (pubKey.get(-1) !== 1){
-    //   throw new Error('Public key has unsupported curve');
-    // }
-    // const x = pubKey.get(-2);
-    // const y = pubKey.get(-3);
-    // if (x.length !== 32 || y.length !== 32){
-    //   throw new Error('Public key has invalid X or Y size');
-    // }
-    // const ser = new Serialize.SerialBuffer({textEncoder: new util.TextEncoder(), textDecoder: new util.TextDecoder()});
-    // ser.push((y[31] & 1) ? 3 : 2);
-    // ser.pushArray(x);
-    // ser.push(flagsToPresence(flags));
-    // ser.pushString(k.rpid);
-    // const compact = ser.asUint8Array();
-    // const key = Numeric.publicKeyToString({
-    //     type: Numeric.KeyType.wa,
-    //     data: compact,
-    // });
-    // consoleLog(key)
     ////////////////////////////////////////////////////////////////////////////////
   } catch (error) {
     console.log('error in [getNewPubKey]', error)
@@ -186,8 +118,122 @@ app.get("/", (req, res) => {
   res.sendFile(p);
   // res.status(200).send("WHATABYTE: Food For Devs");
 });
+const jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
+app.post("/prepareEsr", (req, res) => {
+  try{
+    const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+    const textEncoder = new TextEncoder();
+    const textDecoder = new TextDecoder();
+    const api = new Api({ rpc, textDecoder, textEncoder });
+    const opts = {
+      textEncoder,
+      textDecoder,
+      zlib: {
+        deflateRaw: (data) => new Uint8Array(zlib.deflateRawSync(Buffer.from(data))),
+        inflateRaw: (data) => new Uint8Array(zlib.inflateRawSync(Buffer.from(data))),
+      },
+      abiProvider: {
+        getAbi: async (account) => (await api.getAbi(account))
+      }
+    }
+    console.log('AMIHDEBUG esr, req body::', req.body);
+    /////////////////////////////////////////////////////////////////////////////////
+    async function main() {
+      console.log('[main][0]');
+      const actions = [
+        {
+          "account": "eosio",
+          "name": "newaccount",
+          "authorization": [{
+            "actor": "............1",
+            "permission": "............2"
+          }],
+          "data": {
+            "creator": "............1",
+            "name": req.body.accountName,
+            "owner": {
+              "threshold": 1,
+              "keys": [],
+              "accounts": [{
+              "permission": {
+                "actor": req.body.custodianAccountName,
+                "permission": "active"
+              },
+              "weight": 1
+              }],
+              "waits": []
+            },
+            "active": {
+              "threshold": 1,
+              "keys": [{
+                "key": req.body.pubkey,
+                "weight": 1
+              }],
+              "accounts": [],
+              "waits": []
+            }
+            },
+          },
+          {
+            "account": "eosio",
+            "name": "buyrambytes",
+            "authorization": [{
+            "actor": "............1",
+            "permission": "............2"
+          }],
+          "data": {
+            "payer": "............1",
+            "receiver": req.body.accountname,
+            "bytes": 3200
+          },
+        },
+        {
+          "account": "eosio",
+          "name": "delegatebw",
+          "authorization": [{
+            "actor": "............1",
+            "permission": "............2"
+          }],
+          "data": {
+            "from": "............1",
+            "receiver": req.body.accountname,
+            "stake_net_quantity": "0.0100 EOS",
+            "stake_cpu_quantity": "0.0100 EOS",
+            "transfer": 0
+          },
+        }
+        // ,
+        // {
+        //   "account": "eosio.token",
+        //   "name": "transfer",
+        //   "authorization": [{
+        //   "actor": "............1",
+        //   "permission": "............2"
+        // }],
+        // "data": {
+        //   "from": "............1",
+        //   "to": req.params.accountname,
+        //   "quantity": req.params.initialamount + ' EOS',
+        //   "memo": configFile.siteHeader
+        // }
+        // }
+    ];
+      console.log('[main][1] actions:::', JSON.stringify(actions, null, 2));
+      const request = await SigningRequest.create({ actions, chainId: '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840' }, opts);
+      console.log('The ESR request:::::', util.inspect(request, false, null, true))
+      // encode signing request as URI string
+      const uri = request.encode();
+      console.log(`\n[AMIHDEBUG][request ESR:::][URI]: ${ uri }`)
+    }
+    main().catch(console.error)  
+
+    /////////////////////////////////////////////////////////////////////////////////
+  } catch(err){
+    console.log('Err in server_prepareEsr:', err);
+  }
+});
 app.get("/checkAvailability/:name", (req, res) => {
-	const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+  const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
   // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
   (async () => {
     try{

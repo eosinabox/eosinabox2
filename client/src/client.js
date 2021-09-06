@@ -157,7 +157,27 @@ $(() => {
       await consoleLog( data );
     })
     .catch( err => {
-      console.log('err', err);
+      consoleLog(err);
+    });
+  });
+  $('#eosinabox_prepareEsr').on('click', (event)=>{
+    event.preventDefault();
+    fetch('/prepareEsr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        custodianAccountName: $('#eosinabox_custodianAccountName').val(),
+        accountName:          $('#eosinabox_accountName').val(),
+        pubkey:               $('#eosinabox_pubkey').html(),
+      })
+    })
+    .then(response => response.json())
+    .then(async data => {
+      // $('#eosinabox_pubkey').html(data.pubkey);
+      await consoleLog( { data, stage: 'amihDebug create ESR response in client...' } );
+    })
+    .catch( err => {
+      consoleLog(err);
     });
   });
 });

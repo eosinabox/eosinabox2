@@ -36,7 +36,7 @@
       .eosinabox_help {
 	display: none;
       }
-      #eosinabox_pubkey {
+      #eosinabox_pubkey, #eosinabox_esr {
         border: 1px solid lightgray;
         border-radius: 2px;
       }
@@ -70,6 +70,14 @@
         <li>They will only need to create a key pair using biometrics and send back to you, you will use Greymass
           Anchor wallet to create the account for them</li>
         <li>You will pay for their RAM</li>
+      </ol>
+      <h3>Got a new phone, change my keys to use from here on</h3>
+      <ol>
+        <li>Warning, this is irreverible. Are you sure?</li>
+        <li>Use this if you lost your old phone and need to get access to your account from this new phone instead</li>
+	<li>Create a new key pair</li>
+	<li>Enter your account name</li>
+        <li>I will create a signing-request for you to send to the custodian</li>
       </ol>
       <h3>Delete my account from this phone</h3>
       <ol>
@@ -120,6 +128,8 @@
 	<div id="eosinabox_pubkey" class="text-break"></div>
         <!--button id="esinabox_check_availability" class="btn btn-primary btn-sm" type="submit">Check availability</button-->
         <button id="eosinbox_createKeys" class="btn btn-primary btn-sm" type="submit">Create keys</button>
+	<div id="eosinabox_esr" class="text-break"></div>
+        <button id="eosinabox_prepareEsr" class="btn btn-primary btn-sm" type="submit">Prepare My Account Request</button>
       </form>
     </div>
   </body>
