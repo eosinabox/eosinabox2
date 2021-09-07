@@ -42,8 +42,8 @@ $(() => {
           $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
         }
       });
-      checkIfAllConditionsMet();
     }
+    checkIfAllConditionsMet();
   });
   $('#esinabox_check_availability').on('click', (event)=>{
     event.preventDefault();
@@ -80,9 +80,9 @@ $(() => {
           gState.custodianAccountName = true;
           $('#eosinabox_countCustodianAccountLen').html('Custodian account found');
         }
-        checkIfAllConditionsMet();
       });
     }
+    checkIfAllConditionsMet();
   });
   const checkIfAllConditionsMet = () => {
     // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
