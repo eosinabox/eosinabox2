@@ -117,10 +117,12 @@ $(() => {
   }
   $('#eosinbox_createKeys').on('click', async (event) => {
     event.preventDefault();
-    const randomStringFromServer = 'sadfjhkjwebrkbwfekjbf'; // AMIHDEBUG TODO: generate random string on server and manage it in a session
+    // AMIHDEBUG TODO: generate random string on server and manage it in a session,
+    // Perhaps this is not needed, not worried about replay attacks, discuss...
+    const randomStringFromServer = 'sadfjhkjwebrkbwfekjbf';
     const rp = {
       name: "Ami Heines",
-      id: "amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com
+      id: "amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com (move out to a config .json file?)
     };
     const accName = $('#eosinabox_accountName').val();
     const publicKeyCredentialCreationOptions = {
@@ -136,6 +138,7 @@ $(() => {
       authenticatorSelection: {
         authenticatorAttachment: "platform", // cross-platform or platform or comment out for both
         // warning: we want to require AttestationFlags.attestedCredentialPresent - only works with platform
+        // TODO: discuss, perhaps this is not needed, it's up to the user to keep his security level,
       },
       timeout: 60000,
       attestation: "none" // "direct" is not needed, why bother reading all the different types of attestations?
@@ -155,6 +158,8 @@ $(() => {
       clientDataJSON: eosjs_serialize.arrayToHex(new Uint8Array(credential.response.clientDataJSON)),
     }
     // // decode the clientDataJSON into a utf-8 string
+    // // TODO: discuss, perhaps there is no need to do this on the server side, we can do most
+    // // of the processing on the front end.
     // const utf8Decoder = new TextDecoder('utf-8');
     // const decodedClientData = utf8Decoder.decode( credential.response.clientDataJSON );
     // const clientDataObj = JSON.parse(decodedClientData);
