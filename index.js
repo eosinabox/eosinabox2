@@ -38,18 +38,17 @@ app.post("/consoleLog", (req, res) => {
 });
 app.post("/getNewPubKey", async (req, res) => {
   try {
-    const k = req.body;
-    console.log('AMIHDEBUG getNewPubKey [0] k.rpid:', k.rpid);
-    console.log('AMIHDEBUG getNewPubKey [0] k.id:', k.id);
-    console.log('AMIHDEBUG getNewPubKey [0] k.attestationObject.substr(0,80):', k.attestationObject.substr(0,180));
-    console.log('AMIHDEBUG getNewPubKey [0] k.clientDataJSON.substr(0,80):', k.clientDataJSON.substr(0,180));
+    console.log('AMIHDEBUG getNewPubKey [0] req.body.rpid:', req.body.rpid);
+    console.log('AMIHDEBUG getNewPubKey [0] req.body.id:', req.body.id);
+    console.log('AMIHDEBUG getNewPubKey [0] req.body.attestationObject.substr(0,80):', req.body.attestationObject.substr(0,180));
+    console.log('AMIHDEBUG getNewPubKey [0] req.body.clientDataJSON.substr(0,80):', req.body.clientDataJSON.substr(0,180));
     // // decode the clientDataJSON into a utf-8 string
     // https://medium.com/webauthnworks/verifying-fido2-responses-4691288c8770
     const utf8Decoder = new TextDecoder('utf-8');
-    const decodedClientData = utf8Decoder.decode( Serialize.hexToUint8Array(k.clientDataJSON) );
+    const decodedClientData = utf8Decoder.decode( Serialize.hexToUint8Array(req.body.clientDataJSON) );
     const clientDataObj = JSON.parse(decodedClientData);
     console.log('AMIHDEBUG getNewPubKey [1] clientDataObj:', clientDataObj);
-    const decodedAttestationObj = cbor.decode( k.attestationObject );
+    const decodedAttestationObj = cbor.decode( req.body.attestationObject );
     console.log('AMIHDEBUG getNewPubKey [2] attestationObj:', decodedAttestationObj );
     const {authData} = decodedAttestationObj;
 
@@ -79,23 +78,8 @@ app.post("/getNewPubKey", async (req, res) => {
     const ser = new Serialize.SerialBuffer({textEncoder: new TextEncoder(), textDecoder: new TextDecoder()});
     ser.push((y[31] & 1) ? 3 : 2);
     ser.pushArray(x);
-    //////////////////////////////////////////////////
-    // const enum UserPresence {
-    //   none = 0,
-    //   present = 1,
-    //   verified = 2,
-    // }
-    // function flagsToPresence(flags: number) {
-    //   if (flags & AttestationFlags.userVerified)
-    //     return UserPresence.verified;
-    //   else if (flags & AttestationFlags.userPresent)
-    //     return UserPresence.present;
-    //   else
-    //     return UserPresence.none;
-    // }
-    //////////////////////////////////////////////////
-    ser.push( 1); // should be flags to presence...
-    ser.pushString(k.rpid);
+    ser.push( 1); // enum UserPresence {none = 0,present = 1,verified = 2}
+    ser.pushString(req.body.rpid);
     const compact = ser.asUint8Array();
     const key = Numeric.publicKeyToString({
         type: Numeric.KeyType.wa,
@@ -183,7 +167,7 @@ app.post("/prepareEsr", (req, res) => {
           }],
           "data": {
             "payer": "............1",
-            "receiver": req.body.accountname,
+            "receiver": req.body.accountName,
             "bytes": 3200
           },
         },
@@ -196,7 +180,7 @@ app.post("/prepareEsr", (req, res) => {
           }],
           "data": {
             "from": "............1",
-            "receiver": req.body.accountname,
+            "receiver": req.body.accountName,
             "stake_net_quantity": "0.0100 EOS",
             "stake_cpu_quantity": "0.0100 EOS",
             "transfer": 0
