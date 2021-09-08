@@ -1,7 +1,8 @@
 var gState = {
   accountName: false,
   custodianAccountName: false,
-  pubkey: false
+  pubkey: false,
+  esr: ''
 };
 const consoleLog = async (logObj) => {
   await fetch('/consoleLog', {
@@ -207,10 +208,17 @@ $(() => {
     .then(response => response.json())
     .then(async data => {
       // $('#eosinabox_pubkey').html(data.pubkey);
+      gState.esr = data.esr;
+      $('#eosinabox_prepareEsr').hide();
+      $('#eosinabox_share').show();
       await consoleLog( { data, stage: 'amihDebug create ESR response in client...' } );
     })
     .catch( err => {
       consoleLog(err);
     });
+  });
+  $('#eosinabox_share').on('click', (e)=>{
+    navigator.share({ text: gState.esr })
+    // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
   });
 });
