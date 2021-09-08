@@ -102,7 +102,7 @@ app.post("/getNewPubKey", async (req, res) => {
         data: compact,
     });
     console.log('AMIHDEBUG [6] key: ', key)
-    res.status(200).send({pubkey: key});
+    res.status(200).send({pubkey: key, x: JSON.stringify(x), y: JSON.stringify(y)});
     ////////////////////////////////////////////////////////////////////////////////
     // var AttestationFlags;
     // (function (AttestationFlags) {
