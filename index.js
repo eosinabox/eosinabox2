@@ -151,7 +151,8 @@ app.post("/prepareEsr", (req, res) => {
             "active": {
               "threshold": 1,
               "keys": [{
-                "key": "EOS59RyoSWy4Gq8GJQYEVABj974cYaVo7Z7UcL8AK4Hsjg9p2Gu2i",// TODO: AMIHDEBUG temporary replaced with old type of pubkey just for testing...//req.body.pubkey,
+                // "key": "EOS59RyoSWy4Gq8GJQYEVABj974cYaVo7Z7UcL8AK4Hsjg9p2Gu2i",// TODO: AMIHDEBUG temporary replaced with old type of pubkey just for testing...//req.body.pubkey,
+                "key": req.body.pubkey,
                 "weight": 1
               }],
               "accounts": [],
