@@ -201,16 +201,13 @@ app.post("/prepareEsr", (req, res) => {
         //   "memo": configFile.siteHeader
         // }
         // }
-    ];
+      ];
       console.log('[main][1] actions:::', JSON.stringify(actions, null, 2));
       const request = await SigningRequest.create({ actions, chainId: '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840' }, opts);
-      console.log('The ESR request:::::', util.inspect(request, false, null, true))
-      // encode signing request as URI string
       const uri = request.encode();
       console.log(`\n[AMIHDEBUG][request ESR:::][URI]: ${ uri }`)
     }
     main().catch(console.error)  
-
     /////////////////////////////////////////////////////////////////////////////////
   } catch(err){
     console.log('Err in server_prepareEsr:', err);
