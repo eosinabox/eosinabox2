@@ -8,6 +8,7 @@ const { Api, JsonRpc, Serialize, Numeric } = require('eosjs');
 const fetch = require("node-fetch");
 const bodyParser = require('body-parser');
 const { SigningRequest } = require("eosio-signing-request");
+const zlib = require('zlib');
 /**
  * App Variables
  */
@@ -86,7 +87,7 @@ app.post("/getNewPubKey", async (req, res) => {
         data: compact,
     });
     console.log('AMIHDEBUG [6] key: ', key)
-    res.status(200).send({pubkey: key});
+    res.status(200).send({pubkey: key, x: JSON.stringify(x), y: JSON.stringify(y)});
     ////////////////////////////////////////////////////////////////////////////////
     // var AttestationFlags;
     // (function (AttestationFlags) {
@@ -150,6 +151,7 @@ app.post("/prepareEsr", (req, res) => {
             "active": {
               "threshold": 1,
               "keys": [{
+                // "key": "EOS59RyoSWy4Gq8GJQYEVABj974cYaVo7Z7UcL8AK4Hsjg9p2Gu2i",// TODO: AMIHDEBUG temporary replaced with old type of pubkey just for testing...//req.body.pubkey,
                 "key": req.body.pubkey,
                 "weight": 1
               }],
@@ -206,6 +208,7 @@ app.post("/prepareEsr", (req, res) => {
       const request = await SigningRequest.create({ actions, chainId: '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840' }, opts);
       const uri = request.encode();
       console.log(`\n[AMIHDEBUG][request ESR:::][URI]: ${ uri }`)
+      res.status(200).send({ esr: uri });
     }
     main().catch(console.error)  
     /////////////////////////////////////////////////////////////////////////////////
