@@ -209,8 +209,15 @@ $(() => {
     .then(async data => {
       // $('#eosinabox_pubkey').html(data.pubkey);
       gState.esr = data.esr;
+      gState.cleos = [
+        `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
+        `__CREATOR_ACCOUNT__ ${$('#eosinabox_accountName').val()}`,
+        `${$('#eosinabox_custodianAccountName').val()}@active ${$('#eosinabox_pubkey').html()}`,
+        `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-bytes 3200`,
+      ].join(' ');
       $('#eosinabox_prepareEsr').hide();
       $('#eosinabox_share').show();
+      $('#eosinabox_shareCleos').show();
       await consoleLog( { data, stage: 'amihDebug create ESR response in client...' } );
     })
     .catch( err => {
@@ -219,6 +226,10 @@ $(() => {
   });
   $('#eosinabox_share').on('click', (e)=>{
     navigator.share({ text: gState.esr })
+    // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
+  });
+  $('#eosinabox_shareCleos').on('click', (e)=>{
+    navigator.share({ text: gState.cleos })
     // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
   });
 });
