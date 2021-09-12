@@ -17,11 +17,6 @@ $(() => {
     // Just let default handler run.
     return false;
   }
-  $('.eosinabox_help_header').on('click', ()=>{
-    console.log('AMIHDEBUG toggle visibility?');
-    consoleLog( { consoleLog: 'AMIHDEBUG toggle visibility?' });
-    $('.eosinabox_help').toggle();
-  })
   $('#eosinabox_accountName').on('input', (e) => {
     $('#eosinabox_accountName').val( $('#eosinabox_accountName').val().toLowerCase() );
     const len = $('#eosinabox_accountName').val().length;
@@ -232,4 +227,15 @@ $(() => {
     navigator.share({ text: gState.cleos })
     // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
   });
+  $('nav li a.nav-link').on('click', (e) => {
+    e.preventDefault();
+    $('.navbar-collapse').collapse('hide');
+    $('.eosinabox_page').hide();
+    const href = e.target.href.split('#')[1];
+    $(`.eosinabox_page_${href}`).show();
+    console.log('menu element:', );
+  });
+  // onLoad
+  $('.eosinabox_page').hide();
+  $(`.eosinabox_page_myAccount`).show();
 });
