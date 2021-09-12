@@ -256,10 +256,18 @@ $(() => {
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
   if(window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
+    var o = {};
     for(var i=0; i<params.length; i++){
       var param = params[i].split('=');
+      o[param[0]] = param[1];
       $(`.eosinabox_sharedinfo_${param[0]}`).html(param[1]);
     }
+    const cleosCommand = [
+      `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
+      `##-CREATOR-ACCOUNT-## ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
+      `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-bytes 3200`,
+    ].join(' ');
+    $(`.eosinabox_sharedinfo_cleos`).html(cleosCommand);
     $(`.eosinabox_page_sharedInfo`).show();
   }else{
     $(`.eosinabox_page_myAccount`).show();
