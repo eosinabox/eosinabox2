@@ -84,10 +84,12 @@ $(() => {
     // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
     if(gState.accountName && gState.custodianAccountName && gState.pubkey){
       $('#eosinbox_createKeys' ).hide();
-      $('#eosinabox_prepareEsr').show();
+      // $('#eosinabox_prepareEsr').show();
+      $('#eosinabox_share').show();
     }else{
       $('#eosinbox_createKeys' ).show();
-      $('#eosinabox_prepareEsr').hide();
+      // $('#eosinabox_prepareEsr').hide();
+      $('#eosinabox_share').hide();
     }
   }
   const checkIfAccountNameIsAvailable = (accToCheck, callback) => {
@@ -189,44 +191,53 @@ $(() => {
       consoleLog(err);
     });
   });
-  $('#eosinabox_prepareEsr').on('click', (event)=>{
-    event.preventDefault();
-    fetch('/prepareEsr', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        custodianAccountName: $('#eosinabox_custodianAccountName').val(),
-        accountName:          $('#eosinabox_accountName').val(),
-        pubkey:               $('#eosinabox_pubkey').html(),
-      })
-    })
-    .then(response => response.json())
-    .then(async data => {
-      // $('#eosinabox_pubkey').html(data.pubkey);
-      gState.esr = data.esr;
-      gState.cleos = [
-        `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
-        `__CREATOR_ACCOUNT__ ${$('#eosinabox_accountName').val()}`,
-        `${$('#eosinabox_custodianAccountName').val()}@active ${$('#eosinabox_pubkey').html()}`,
-        `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-bytes 3200`,
-      ].join(' ');
-      $('#eosinabox_prepareEsr').hide();
-      $('#eosinabox_share').show();
-      $('#eosinabox_shareCleos').show();
-      await consoleLog( { data, stage: 'amihDebug create ESR response in client...' } );
-    })
-    .catch( err => {
-      consoleLog(err);
-    });
-  });
+  // $('#eosinabox_prepareEsr').on('click', (event)=>{
+  //   event.preventDefault();
+  //   fetch('/prepareEsr', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       custodianAccountName: $('#eosinabox_custodianAccountName').val(),
+  //       accountName:          $('#eosinabox_accountName').val(),
+  //       pubkey:               $('#eosinabox_pubkey').html(),
+  //     })
+  //   })
+  //   .then(response => response.json())
+  //   .then(async data => {
+  //     // $('#eosinabox_pubkey').html(data.pubkey);
+  //     gState.esr = data.esr;
+  //     gState.cleos = [
+  //       `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
+  //       `__CREATOR_ACCOUNT__ ${$('#eosinabox_accountName').val()}`,
+  //       `${$('#eosinabox_custodianAccountName').val()}@active ${$('#eosinabox_pubkey').html()}`,
+  //       `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-bytes 3200`,
+  //     ].join(' ');
+  //     $('#eosinabox_prepareEsr').hide();
+  //     $('#eosinabox_share').show();
+  //     $('#eosinabox_shareCleos').show();
+  //     await consoleLog( { data, stage: 'amihDebug create ESR response in client...' } );
+  //   })
+  //   .catch( err => {
+  //     consoleLog(err);
+  //   });
+  // });
   $('#eosinabox_share').on('click', (e)=>{
-    navigator.share({ text: gState.esr })
+    gState.shareEssentials = {
+      custodianAccountName: $('#eosinabox_custodianAccountName').val(),
+      accountName:          $('#eosinabox_accountName').val(),
+      pubkey:               $('#eosinabox_pubkey').html(),
+    };
+
+    // navigator.share({ text: gState.esr })
+    navigator.share({ url: `https://eosinabox.amiheines.com/sharedInfo?chain=jungle3&accountName=${gState.shareEssentials.accountName}` +
+      `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
+    });
     // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
   });
-  $('#eosinabox_shareCleos').on('click', (e)=>{
-    navigator.share({ text: gState.cleos })
-    // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
-  });
+  // $('#eosinabox_shareCleos').on('click', (e)=>{
+  //   navigator.share({ text: gState.cleos })
+  //   // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
+  // });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
     $('.navbar-collapse').collapse('hide');
@@ -235,7 +246,22 @@ $(() => {
     $(`.eosinabox_page_${href}`).show();
     console.log('menu element:', );
   });
+  $('.eosinabox_dropdown_blockchain a.dropdown-item').on('click', (e)=>{
+    console.log('data-chain:', $(e.target).data('chain'));
+    console.log('text: ', $(e.target).text());
+    $('.eosinabox_dropdown_blockchain>button').html(`Blockchain: ${$(e.target).text()} <i class="bi bi-check-circle-fill"></i>`);
+  });
   // onLoad
   $('.eosinabox_page').hide();
-  $(`.eosinabox_page_myAccount`).show();
+  // if url has #sharedInfo in it, get the parameters and navigate to the right page.
+  if(window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
+    const params = window.location.href.split('#')[1].split('?')[1].split('&');
+    for(var i=0; i<params.length; i++){
+      var param = params[i].split('=');
+      $(`.eosinabox_sharedinfo_${param[0]}`).html(param[1]);
+    }
+    $(`.eosinabox_page_sharedInfo`).show();
+  }else{
+    $(`.eosinabox_page_myAccount`).show();
+  }
 });
