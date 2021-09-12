@@ -81,7 +81,7 @@
     <div class="container-fluid eosinabox_page eosinabox_page_createAccount">
       <div class="row">
         <div class="col">
-          <h3 class="eosinabox_create_account_header">Want to create an account?</h3>
+          <h3 class="eosinabox_create_account_header">Create New Account</h3>
         </div>
       </div>
       <div class="row">
@@ -125,104 +125,114 @@
       <div class="row">
         <div class="col">
           <div id="eosinabox_esr" class="text-break"></div>
-          <button id="eosinabox_prepareEsr" class="btn btn-primary btn-sm" type="submit">Prepare My Account Request</button>
           <button id="eosinabox_share"      class="btn btn-primary btn-sm" type="submit">Share My Account Creation Request</button>
-          <button id="eosinabox_shareCleos" class="btn btn-primary btn-sm" type="submit">Share My Account Creation Request "cleos"</button>
+        </div>
       </div>
     </div>
     <div class="container-fluid eosinabox_page eosinabox_page_restoreAccount">
       <div class="row">
-        <h3>Restore access</h3>
-        <p>
-          This page will help you regain access to your blockchain account from a new phone.
-          You will need to enter the account name and create new keys using biometrics.
-          Then you will "share" the info with the custodian of your account, your trusted friend.
-          Your trusted friend will replace the keys for your account and then you will have access from your new phone.
-        </p>
+        <div class="col">
+          <h3>Restore access</h3>
+          <p>
+            This page will help you regain access to your blockchain account from a new phone.
+            You will need to enter the account name and create new keys using biometrics.
+            Then you will "share" the info with the custodian of your account, your trusted friend.
+            Your trusted friend will replace the keys for your account and then you will have access from your new phone.
+          </p>
+        </div>
       </div>
     </div>
     <div class="container-fluid eosinabox_page eosinabox_page_help">
       <div class="row">
-        <h1>Help</h1>
-        <h2 class="eosinabox_help_header">Jungle3 test only for the Alpha phase</h2>
-        <div class="eosinabox_help">
-          <p>Jungle3 test only for the Alpha phase</p>
-          <h3>Get yourself an account!</h3>
-          <ol>
-            <li>In the future you'll choose the blockchain (EOS/Jungle3)</li>
-            <li>Test if an account name is available on the jungle3 test net (legal 12 character names only)</li>
-            <li>Create a key pair using biometrics for it, the magic happens here!</li>
-            <li>Who do you want to trust to be the admin for your account? The Owner permission in EOS slang.
-              In the future this will be more complicated, you'll be able to choose a threshold and some
-              accounts, keys and time delays</li>
-            <li>Send the account name and the public key to a friend who will create the account for you,
-              using ESR tech by Greymass, to be used in Anchor wallet</li>
-          </ol>
-          <h3>Want to help a friend create an account?</h3>
-          <ol>
-            <li>Choose a blockchain (currently only jungle3)</li>
-            <li>Explain to them about regular account name format - 12 characters of the range: a-z or 1-5</li>
-            <li>Who will be the Owner permission for their account? Explain to them they need to trust you if they
-              choose you to be the Owner, this will be used if their phone is lost or broken</li>
-            <li>Send them this link (future) which will get them to this app and will pre-populate the fields for them</li>
-            <li>They will only need to create a key pair using biometrics and send back to you, you will use Greymass
-              Anchor wallet to create the account for them</li>
-            <li>You will pay for their RAM</li>
-          </ol>
-          <h3>Got a new phone, change my keys to use from here on</h3>
-          <ol>
-            <li>Use this if you lost your old phone and need to get access to your account from this new phone instead</li>
-            <li>Create a new key pair</li>
-            <li>Enter your account name</li>
-            <li>I will create a signing-request for you to send to the custodian</li>
-          </ol>
-          <h3>Delete my account from this phone</h3>
-          <ol>
-            <li>Warning, this is irreverible. Are you sure?</li>
-            <li>Use this if you're giving the phone to someone else</li>
-            <li>Check the owner of the account to verify the account will be accessible using that permission</li>
-            <li>Are you sure? --> ok, I'm deleting the public key info</li>
-          </ol>
-          <h3>Send EOS to another wallet</h3>
-          <ol>
-            <li>Who to send to?</li>
-            <li>How much?</li>
-            <li>Add optional memo</li>
-            <li>Send! you'll have to use biometrics to approve, perhaps with a slider before this step like in Anchor wallet</li>
-          </ol>
-          <h3>Approve any transaction request</h3>
-          <ol>
-            <li>Using ESR, EOSIO Signature Request</li>
-            <li>Review details</li>
-            <li>Approve or deny sliding widget</li>
-            <li>Biometrics for final approval</li>
-          </ol>
-          <h3>View balances in any contract/token</h3>
-          <ol>
-            <li>Want to see additional balances in contracts/tokens?</li>
-            <li>Choose from a pre-made list</li>
-            <li>Or let me know the account and the token (has to be an eosio.token compatible contract)</li>
-          </ol>
+        <div class="col">
+          <h1>Help</h1>
+          <h2 class="eosinabox_help_header">Jungle3 test only for the Alpha phase</h2>
+          <div class="eosinabox_help">
+            <p>Jungle3 test only for the Alpha phase</p>
+            <h3>Get yourself an account!</h3>
+            <ol>
+              <li>In the future you'll choose the blockchain (EOS/Jungle3)</li>
+              <li>Test if an account name is available on the jungle3 test net (legal 12 character names only)</li>
+              <li>Create a key pair using biometrics for it, the magic happens here!</li>
+              <li>Who do you want to trust to be the admin for your account? The Owner permission in EOS slang.
+                In the future this will be more complicated, you'll be able to choose a threshold and some
+                accounts, keys and time delays</li>
+              <li>Send the account name and the public key to a friend who will create the account for you,
+                using ESR tech by Greymass, to be used in Anchor wallet</li>
+            </ol>
+            <h3>Want to help a friend create an account?</h3>
+            <ol>
+              <li>Choose a blockchain (currently only jungle3)</li>
+              <li>Explain to them about regular account name format - 12 characters of the range: a-z or 1-5</li>
+              <li>Who will be the Owner permission for their account? Explain to them they need to trust you if they
+                choose you to be the Owner, this will be used if their phone is lost or broken</li>
+              <li>Send them this link (future) which will get them to this app and will pre-populate the fields for them</li>
+              <li>They will only need to create a key pair using biometrics and send back to you, you will use Greymass
+                Anchor wallet to create the account for them</li>
+              <li>You will pay for their RAM</li>
+            </ol>
+            <h3>Got a new phone, change my keys to use from here on</h3>
+            <ol>
+              <li>Use this if you lost your old phone and need to get access to your account from this new phone instead</li>
+              <li>Create a new key pair</li>
+              <li>Enter your account name</li>
+              <li>I will create a signing-request for you to send to the custodian</li>
+            </ol>
+            <h3>Delete my account from this phone</h3>
+            <ol>
+              <li>Warning, this is irreverible. Are you sure?</li>
+              <li>Use this if you're giving the phone to someone else</li>
+              <li>Check the owner of the account to verify the account will be accessible using that permission</li>
+              <li>Are you sure? - - > ok, I'm deleting the public key info</li>
+            </ol>
+            <h3>Send EOS to another wallet</h3>
+            <ol>
+              <li>Who to send to?</li>
+              <li>How much?</li>
+              <li>Add optional memo</li>
+              <li>Send! you'll have to use biometrics to approve, perhaps with a slider before this step like in Anchor wallet</li>
+            </ol>
+            <h3>Approve any transaction request</h3>
+            <ol>
+              <li>Using ESR, EOSIO Signature Request</li>
+              <li>Review details</li>
+              <li>Approve or deny sliding widget</li>
+              <li>Biometrics for final approval</li>
+            </ol>
+            <h3>View balances in any contract/token</h3>
+            <ol>
+              <li>Want to see additional balances in contracts/tokens?</li>
+              <li>Choose from a pre-made list</li>
+              <li>Or let me know the account and the token (has to be an eosio.token compatible contract)</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>
     <div class="container eosinabox_page eosinabox_page_sharedInfo">
       <div class="row">
-        <h3>Shared Info</h3>
-        <p>
-          This info was shared using a link:
-        </p>
-      </div>
-      <div class="row">
-        <div class="col-xs-6">
-          <label>Chain:</label>
+        <div class="col">
+          <h3>Shared Info</h3>
+          <p>
+            This info was shared using a link:
+          </p>
         </div>
-        <div class="col-xs-6 eosinabox_sharedinfo_chain"></div>
       </div>
       <div class="row">
-        <label>Account Name:</label> <div class="eosinabox_sharedinfo_accountName"></div>
-        <label>Custodian:</label> <div class="eosinabox_sharedinfo_custodianAccountName"></div>
-        <label>Public Key:</label> <div class="eosinabox_sharedinfo_pubkey"></div>
+        <div class="col">Chain:</div>
+        <div class="col eosinabox_sharedinfo_chain"></div>
+      </div>
+      <div class="row">
+        <div class="col">Account Name:</div>
+        <div class="col eosinabox_sharedinfo_accountName"></div>
+      </div>
+      <div class="row">
+        <div class="col">Custodian:</div>
+        <div class="col eosinabox_sharedinfo_custodianAccountName"></div>
+      </div>
+      <div class="row">
+        <div class="col">Public Key:</div>
+        <div class="col eosinabox_sharedinfo_pubkey"></div>
       </div>
     </div>
   </body>

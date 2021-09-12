@@ -244,7 +244,7 @@ $(() => {
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
     $(`.eosinabox_page_${href}`).show();
-    console.log('menu element:', );
+    console.log('menu element:::', href);
   });
   $('.eosinabox_dropdown_blockchain a.dropdown-item').on('click', (e)=>{
     console.log('data-chain:', $(e.target).data('chain'));
