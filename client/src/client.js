@@ -229,7 +229,7 @@ $(() => {
     };
 
     // navigator.share({ text: gState.esr })
-    navigator.share({ url: `https://eosinabox.amiheines.com/sharedInfo?chain=jungle3&accountName=${gState.shareEssentials.accountName}` +
+    navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
     // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
