@@ -175,13 +175,8 @@ $(() => {
   ///////////////////////////////////////////////////////////////////////////////////
   $('#eosinabox_transfer_transact').on('click', async (event) => {
     event.preventDefault();
-    // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData }) {
     const chainId = jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
-    // eosjs_api
-    // eosjs_jsonrpc
-    // eosjs_wasig
-    // eosjs_serialize
-    const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider(); // AMIHDEBUG A ha! using the webauthn!
+    const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
     signatureProvider.keys.clear();
     const keys = JSON.parse( localStorage.eosinabox_pubkeys_jungle3 );
     for (const key of keys){
@@ -203,7 +198,7 @@ $(() => {
         authorization: [{ actor: from, permission: 'active' }],
       }],
     }, {
-      blocksBehind: 39,
+      blocksBehind: 3,
       expireSeconds: 60,
     });
     ///////////////////////////////////////////////////
