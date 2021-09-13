@@ -192,6 +192,7 @@ $(() => {
     const to       = $('#eosinabox_transfer_to'      ).val();
     const quantity = $('#eosinabox_transfer_quantity').val();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
+    console.log('from, to, quant, memo:', from, to, quantity, memo);
     await api.transact({
       actions: [{
         account: 'eosio.token',
