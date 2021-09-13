@@ -2340,6 +2340,7 @@ var WebAuthnSignatureProvider = /** @class */ (function () {
                                     allowCredentials: [{
                                             id: id,
                                             type: 'public-key',
+                                            transports: ["internal"],
                                         }],
                                     challenge: digest.buffer,
                                 },
