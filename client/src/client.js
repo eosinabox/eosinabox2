@@ -171,7 +171,7 @@ $(() => {
     });
   });
   ///////////////////////////////////////////////////////////////////////////////////
-  $('#eosinbox_signTransaction').on('click', async (event) => {
+  $('#eosinabox_transfer_transact').on('click', async (event) => {
     event.preventDefault();
     // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData }) {
     const chainId = jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
@@ -257,7 +257,7 @@ $(() => {
   // onLoad
   $('.eosinabox_page').hide();
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
-  if(window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
+  if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
     var o = {};
     for(var i=0; i<params.length; i++){
