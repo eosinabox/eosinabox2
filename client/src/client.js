@@ -154,11 +154,13 @@ $(() => {
       gState.pubkey = true;
       $('#eosinabox_pubkey').html(data.pubkey);
       // save in localStorage
+      let credentialIdHex = eosjs_serialize.arrayToHex(new Uint8Array(credential.id));
+      console.log('pubkeyAsHex: ', credentialIdHex);
       if( !localStorage['eosinabox_pubkeys_jungle3'] ){
-        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credential.id, key: data.pubkey }] );
+        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }else{
         let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
-        o.push({ credentialId: credential.id, key: data.pubkey });
+        o.push({ credentialId: credentialIdHex, key: data.pubkey });
         localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
       }
       checkIfAllConditionsMet();
