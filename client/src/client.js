@@ -179,9 +179,9 @@ $(() => {
     // eosjs_jsonrpc
     // eosjs_wasig
     // eosjs_serialize
-    const signatureProvider = new eosjs_wasig(); // AMIHDEBUG A ha! using the webauthn!
-    const rpc = new JsonRpc('http://jungle3.cryptolions.io:80');
-    const api = new Api({ rpc, signatureProvider });
+    const signatureProvider = new eosjs_wasig.WaSignatureProvider(); // AMIHDEBUG A ha! using the webauthn!
+    const rpc = new new eosjs_jsonrpc.JsonRpc('http://jungle3.cryptolions.io:80');
+    const api = new eosjs_api.Api({ rpc, signatureProvider });
     console.log('[eosinbox_signTransaction] [click] [5]');
     const from     = $('#eosinabox_transfer_from'    ).val();
     const to       = $('#eosinabox_transfer_to'      ).val();
