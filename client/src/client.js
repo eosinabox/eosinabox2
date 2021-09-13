@@ -203,8 +203,8 @@ $(() => {
         authorization: [{ actor: from, permission: 'active' }],
       }],
     }, {
-      blocksBehind: 3,
-      expireSeconds: 60 * 60,
+      blocksBehind: 39,
+      expireSeconds: 60,
     });
     ///////////////////////////////////////////////////
   });
