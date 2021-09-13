@@ -13,9 +13,8 @@ const consoleLog = async (logObj) => {
 }
 $(() => {
   window.onerror = function errorHandler(msg, url, line) {
-    consoleLog(arguments);
-    // Just let default handler run.
-    return false;
+    consoleLog({ logMsg: 'clientSideError', arguments });
+    return false; // Just let default handler run.
   }
   $('#eosinabox_accountName').on('input', (e) => {
     $('#eosinabox_accountName').val( $('#eosinabox_accountName').val().toLowerCase() );
@@ -29,11 +28,9 @@ $(() => {
       $('#eosinabox_countAccountLen').html('Checking if the account name is available...');
       checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
         if(res.accountAvailable){
-          // alert('Account is available');
           gState.accountName = true;
           $('#eosinabox_countAccountLen').html('Account is available');
         }else{
-          // alert('Account is already taken, please try another name');
           gState.accountName = false;
           $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
         }
@@ -45,11 +42,9 @@ $(() => {
     event.preventDefault();
     checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
       if(res.accountAvailable){
-        // alert('Account is available');
         gState.accountName = true;
         $('#eosinabox_countAccountLen').html('Account is available');
       }else{
-        // alert('Account is already taken, please try another name');
         gState.accountName = false;
         $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
       }
@@ -68,11 +63,9 @@ $(() => {
       $('#eosinabox_countCustodianAccountLen').html('Checking if the custodian account name exists...');
       checkIfAccountNameIsAvailable( $('#eosinabox_custodianAccountName').val(), res => {
         if(res.accountAvailable){
-          // alert('Custodian Account does not exist, please try again');
           gState.custodianAccountName = false;
           $('#eosinabox_countCustodianAccountLen').html('Custodian Account does not exist, please try again');
         }else{
-          // alert('Custodian account found');
           gState.custodianAccountName = true;
           $('#eosinabox_countCustodianAccountLen').html('Custodian account found');
         }
@@ -84,11 +77,9 @@ $(() => {
     // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
     if(gState.accountName && gState.custodianAccountName && gState.pubkey){
       $('#eosinbox_createKeys' ).hide();
-      // $('#eosinabox_prepareEsr').show();
       $('#eosinabox_share').show();
     }else{
       $('#eosinbox_createKeys' ).show();
-      // $('#eosinabox_prepareEsr').hide();
       $('#eosinabox_share').hide();
     }
   }
@@ -117,7 +108,7 @@ $(() => {
     event.preventDefault();
     // AMIHDEBUG TODO: generate random string on server and manage it in a session,
     // Perhaps this is not needed, not worried about replay attacks, discuss...
-    const randomStringFromServer = 'sadfjhkjwebrkbwfekjbf';
+    const randomStringFromServer = 'replayAttackProtectionRandomStringNotNeeded?';
     const rp = {
       name: "Ami Heines",
       id: "amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com (move out to a config .json file?)
@@ -142,36 +133,16 @@ $(() => {
       attestation: "none" // "direct" is not needed, why bother reading all the different types of attestations?
       // the authData contains the pubKey and we will *maybe* check the attestation later, in a future version
     };
-    const credential = await navigator.credentials.create({
-        publicKey: publicKeyCredentialCreationOptions
-    });
+    const credential = await navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions });
     console.log('credential', credential);
-    /////////////////////////////////////////
-    // take the credentials and make an object to send to the server!
-    // helper: eosjs_serialize.arrayToHex([12,32,11])
     const credForServer = {
       rpid: rp.id,
       id: eosjs_serialize.arrayToHex(new Uint8Array(credential.rawId)),
       attestationObject: eosjs_serialize.arrayToHex(new Uint8Array(credential.response.attestationObject)),
       clientDataJSON: eosjs_serialize.arrayToHex(new Uint8Array(credential.response.clientDataJSON)),
     }
-    // // decode the clientDataJSON into a utf-8 string
     // // TODO: discuss, perhaps there is no need to do this on the server side, we can do most
     // // of the processing on the front end.
-    // const utf8Decoder = new TextDecoder('utf-8');
-    // const decodedClientData = utf8Decoder.decode( credential.response.clientDataJSON );
-    // const clientDataObj = JSON.parse(decodedClientData);
-    // const decodedAttestationObj = CBOR.decode( credential.response.attestationObject );
-    // const {authData} = decodedAttestationObj;
-    // // get the length of the credential ID
-    // const dataView = new DataView( new ArrayBuffer(2) );
-    // const idLenBytes = authData.slice(53, 55);
-    // idLenBytes.forEach( (value, index) => dataView.setUint8( index, value ) );
-    // const credentialIdLength = dataView.getUint16();
-    // const credentialId = authData.slice( 55, 55 + credentialIdLength); // get the credential ID
-    // const publicKeyBytes = authData.slice( 55 + credentialIdLength ); // get the public key object
-    // const publicKeyObject = CBOR.decode( publicKeyBytes.buffer ); // the publicKeyBytes are encoded again as CBOR
-    // consoleLog({ msg: 'AMIHDEBUG credForServer:', credForServer });
     fetch('/getNewPubKey', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -182,6 +153,14 @@ $(() => {
       console.log('AMIHDEBUG did we get back the Pubkey from the server?', data);
       gState.pubkey = true;
       $('#eosinabox_pubkey').html(data.pubkey);
+      // save in localStorage
+      if( !localStorage['eosinabox_pubkeys_jungle3'] ){
+        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credential.id, key: data.pubkey }] );
+      }else{
+        let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
+        o.push({ credentialId: credential.id, key: data.pubkey });
+        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
+      }
       checkIfAllConditionsMet();
       await consoleLog( data );
     })
@@ -191,6 +170,37 @@ $(() => {
       consoleLog(err);
     });
   });
+  ///////////////////////////////////////////////////////////////////////////////////
+  $('#eosinbox_signTransaction').on('click', async (event) => {
+    event.preventDefault();
+    // { chainId, requiredKeys, serializedTransaction, serializedContextFreeData }) {
+    const chainId = jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
+    // eosjs_api
+    // eosjs_jsonrpc
+    // eosjs_wasig
+    // eosjs_serialize
+    const signatureProvider = new eosjs_wasig(); // AMIHDEBUG A ha! using the webauthn!
+    const rpc = new JsonRpc('http://jungle3.cryptolions.io:80');
+    const api = new Api({ rpc, signatureProvider });
+    console.log('[eosinbox_signTransaction] [click] [5]');
+    const from     = $('#eosinabox_transfer_from'    ).val();
+    const to       = $('#eosinabox_transfer_to'      ).val();
+    const quantity = $('#eosinabox_transfer_quantity').val();
+    const memo     = $('#eosinabox_transfer_memo'    ).val();
+    await api.transact({
+      actions: [{
+        account: 'eosio.token',
+        name: 'transfer',
+        data: { from, to, quantity, memo },
+        authorization: [{ actor: from, permission: 'active' }],
+      }],
+    }, {
+      blocksBehind: 3,
+      expireSeconds: 60 * 60,
+    });
+    ///////////////////////////////////////////////////
+  });
+  ///////////////////////////////////////////////////////////////////////////////////
   // $('#eosinabox_prepareEsr').on('click', (event)=>{
   //   event.preventDefault();
   //   fetch('/prepareEsr', {
