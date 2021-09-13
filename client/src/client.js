@@ -154,7 +154,7 @@ $(() => {
       gState.pubkey = true;
       $('#eosinabox_pubkey').html(data.pubkey);
       // save in localStorage
-      let credentialIdHex = eosjs_serialize.arrayToHex(new Uint8Array(credential.id));
+      let credentialIdHex = eosjs_serialize.arrayToHex(new Uint8Array(credential.rawId));
       console.log('pubkeyAsHex: ', credentialIdHex);
       if( !localStorage['eosinabox_pubkeys_jungle3'] ){
         localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
