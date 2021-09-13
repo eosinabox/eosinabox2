@@ -210,7 +210,7 @@ $(() => {
   //       `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
   //       `__CREATOR_ACCOUNT__ ${$('#eosinabox_accountName').val()}`,
   //       `${$('#eosinabox_custodianAccountName').val()}@active ${$('#eosinabox_pubkey').html()}`,
-  //       `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-bytes 3200`,
+  //       `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-kbytes 3`,
   //     ].join(' ');
   //     $('#eosinabox_prepareEsr').hide();
   //     $('#eosinabox_share').show();
@@ -227,17 +227,10 @@ $(() => {
       accountName:          $('#eosinabox_accountName').val(),
       pubkey:               $('#eosinabox_pubkey').html(),
     };
-
-    // navigator.share({ text: gState.esr })
     navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
-    // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
   });
-  // $('#eosinabox_shareCleos').on('click', (e)=>{
-  //   navigator.share({ text: gState.cleos })
-  //   // navigator.share({ text: `<a href="${gState.esr}">Create EOS in a Box account</a>` })
-  // });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
     $('.navbar-collapse').collapse('hide');
@@ -264,8 +257,8 @@ $(() => {
     }
     const cleosCommand = [
       `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
-      `##-CREATOR-ACCOUNT-## ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
-      `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-bytes 3200`,
+      `_CREATOR_ACCOUNT_ ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
+      `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-kbytes 3`,
     ].join(' ');
     $(`.eosinabox_sharedinfo_cleos`).html(cleosCommand);
     $(`.eosinabox_page_sharedInfo`).show();
