@@ -188,9 +188,9 @@ $(() => {
     const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     console.log('[eosinbox_signTransaction] [click] [5]');
-    const from     = $('#eosinabox_transfer_from'    ).val();
-    const to       = $('#eosinabox_transfer_to'      ).val();
-    const quantity = $('#eosinabox_transfer_quantity').val();
+    const from     = $('#eosinabox_transfer_from'    ).val().toLowerCase();
+    const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
+    const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
     console.log('from, to, quant, memo:', from, to, quantity, memo);
     await api.transact({
