@@ -52,16 +52,23 @@ app.post("/getNewPubKey", async (req, res) => {
     const decodedAttestationObj = cbor.decode( req.body.attestationObject );
     console.log('AMIHDEBUG getNewPubKey [2] attestationObj:', decodedAttestationObj );
     const {authData} = decodedAttestationObj;
-    ////////////////////////////////////////
-    const flags = authData.slice(33,34);
-    console.log('AMIHDEBUG flags: ', flags);
-    const uint8AuthData = new Uint8Array(authData);
-    console.log('AMIHDEBUG uint8AuthData: ', uint8AuthData);
-    const uint8Flags = new Uint8Array(authData.slice(32,33));
-    console.log('AMIHDEBUG uint8Flags: ', uint8Flags);
-    console.log('AMIHDEBUG uint8Flags[0]: ', uint8Flags[0]);
-    // console.log('AMIHDEBUG flags BINARY: ', (flags).toString(2));
-    ////////////////////////////////////////
+    const flagsFromAuthData = (new Uint8Array(authData.slice(32,33)))[0];
+    const AttestationFlags = {
+      userPresent: 0x01,
+      userVerified: 0x04,
+      attestedCredentialPresent: 0x40,
+      extensionDataPresent: 0x80,
+    }
+    const flagsToPresence = (flags) => {
+      if (flags & AttestationFlags.userVerified)
+        return 2; // UserPresence.verified
+      else if (flags & AttestationFlags.userPresent)
+        return 1; // UserPresence.present
+      else
+        return 0; // UserPresence.none
+    }
+    const flagsToPresenceResult = flagsToPresence(flagsFromAuthData);
+    console.log('AMIHDEBUG flagsToPresenceResult:', flagsToPresenceResult);
     // get the length of the credential ID
     const dataView = new DataView( new ArrayBuffer(2) );
     const idLenBytes = authData.slice(53, 55);
@@ -88,7 +95,7 @@ app.post("/getNewPubKey", async (req, res) => {
     const ser = new Serialize.SerialBuffer({textEncoder: new TextEncoder(), textDecoder: new TextDecoder()});
     ser.push((y[31] & 1) ? 3 : 2);
     ser.pushArray(x);
-    ser.push( 1); // enum UserPresence {none = 0,present = 1,verified = 2}
+    ser.push(flagsToPresenceResult); // enum UserPresence {none = 0,present = 1,verified = 2}
     ser.pushString(req.body.rpid);
     const compact = ser.asUint8Array();
     const key = Numeric.publicKeyToString({
