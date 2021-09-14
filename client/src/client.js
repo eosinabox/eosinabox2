@@ -191,7 +191,7 @@ $(() => {
     const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
     console.log('from, to, quant, memo:', from, to, quantity, memo);
-    await api.transact({
+    const result = await api.transact({
       actions: [{
         account: 'eosio.token',
         name: 'transfer',
@@ -202,6 +202,7 @@ $(() => {
       blocksBehind: 3,
       expireSeconds: 60,
     });
+    consoleLog( {logMsg: 'transfer EOS!', result } );
     ///////////////////////////////////////////////////
   });
   ///////////////////////////////////////////////////////////////////////////////////
