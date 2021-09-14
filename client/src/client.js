@@ -159,9 +159,11 @@ $(() => {
       if( !localStorage['eosinabox_pubkeys_jungle3'] ){
         localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }else{
-        let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
-        o.push({ credentialId: credentialIdHex, key: data.pubkey });
-        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
+        // save just the new key, distroy the older ones!
+        // let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
+        // o.push({ credentialId: credentialIdHex, key: data.pubkey });
+        // localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
+        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }
       checkIfAllConditionsMet();
       await consoleLog( data );
@@ -175,7 +177,6 @@ $(() => {
   ///////////////////////////////////////////////////////////////////////////////////
   $('#eosinabox_transfer_transact').on('click', async (event) => {
     event.preventDefault();
-    const chainId = jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
     signatureProvider.keys.clear();
     const keys = JSON.parse( localStorage.eosinabox_pubkeys_jungle3 );

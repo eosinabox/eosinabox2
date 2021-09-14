@@ -52,7 +52,11 @@ app.post("/getNewPubKey", async (req, res) => {
     const decodedAttestationObj = cbor.decode( req.body.attestationObject );
     console.log('AMIHDEBUG getNewPubKey [2] attestationObj:', decodedAttestationObj );
     const {authData} = decodedAttestationObj;
-
+    ////////////////////////////////////////
+    const flags = data.getUint8(33);
+    console.log('AMIHDEBUG flags: ', flags);
+    console.log('AMIHDEBUG flags BINARY: ', (flags).publicKeyToString(2));
+    ////////////////////////////////////////
     // get the length of the credential ID
     const dataView = new DataView( new ArrayBuffer(2) );
     const idLenBytes = authData.slice(53, 55);
