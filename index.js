@@ -53,9 +53,13 @@ app.post("/getNewPubKey", async (req, res) => {
     console.log('AMIHDEBUG getNewPubKey [2] attestationObj:', decodedAttestationObj );
     const {authData} = decodedAttestationObj;
     ////////////////////////////////////////
-    const flags = data.getUint8(33);
+    const flags = authData.slice(33,34);
     console.log('AMIHDEBUG flags: ', flags);
-    console.log('AMIHDEBUG flags BINARY: ', (flags).publicKeyToString(2));
+    const uint8AuthData = new Uint8Array.from(authData);
+    console.log('AMIHDEBUG uint8AuthData: ', uint8AuthData);
+    const uint8Flags = new Uint8Array.from(authData.slice(33,34));
+    console.log('AMIHDEBUG uint8Flags: ', uint8Flags);
+    // console.log('AMIHDEBUG flags BINARY: ', (flags).toString(2));
     ////////////////////////////////////////
     // get the length of the credential ID
     const dataView = new DataView( new ArrayBuffer(2) );
