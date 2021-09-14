@@ -104,6 +104,10 @@ $(() => {
       console.error('Error in FETCH:', error);
     });
   }
+  const getCurrencyBalance = async (code, account, symbol) => {
+    const response = await fetch(`/getCurrencyBalance/${code}/${account}/${symbol}`);
+    return response.json();
+  }
   $('#eosinbox_createKeys').on('click', async (event) => {
     event.preventDefault();
     // AMIHDEBUG TODO: generate random string on server and manage it in a session,
@@ -272,6 +276,11 @@ $(() => {
   // onLoad
   $('.eosinabox_page').hide();
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
+  (async () => {
+    const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
+    console.log('bal::', balance);
+    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat"></i>` );
+  })();
   if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
     var o = {};
