@@ -26,11 +26,14 @@ const port = process.env.PORT || "8000";
 /**
  * Routes Definitions
  */
-app.get("/client/src/eosjs/dist-web/:filename", (req, res) => {
-  res.sendFile( path.join(__dirname, 'client/src/eosjs/dist-web', req.params.filename) );
+app.get("/", (req, res) => {
+  res.sendFile( path.join(__dirname, 'client/src', 'index.html') );
 });
 app.get("/client/src/:filename", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
+});
+app.get("/client/src/eosjs/dist-web/:filename", (req, res) => {
+  res.sendFile( path.join(__dirname, 'client/src/eosjs/dist-web', req.params.filename) );
 });
 app.post("/consoleLog", (req, res) => {
   console.log('[consoleLog]:::', JSON.stringify(req.body, null, 2));
@@ -104,140 +107,129 @@ app.post("/getNewPubKey", async (req, res) => {
     });
     console.log('AMIHDEBUG [6] key: ', key)
     res.status(200).send({pubkey: key, x: JSON.stringify(x), y: JSON.stringify(y)});
-    ////////////////////////////////////////////////////////////////////////////////
-    // var AttestationFlags;
-    // (function (AttestationFlags) {
-    ////////////////////////////////////////////////////////////////////////////////
   } catch (error) {
     console.log('error in [getNewPubKey]', error)
     res.status(200).send({ msg: 'error in getNewPubKey' });
   }
 });
-app.get("/", (req, res) => {
-  var p = path.join(__dirname, 'client/src', 'index.html');
-  console.log('[AMIHDEBUG] PATH:::', p);
-  res.sendFile(p);
-  // res.status(200).send("WHATABYTE: Food For Devs");
-});
-const jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
-app.post("/prepareEsr", (req, res) => {
-  try{
-    const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
-    const textEncoder = new TextEncoder();
-    const textDecoder = new TextDecoder();
-    const api = new Api({ rpc, textDecoder, textEncoder });
-    const opts = {
-      textEncoder,
-      textDecoder,
-      zlib: {
-        deflateRaw: (data) => new Uint8Array(zlib.deflateRawSync(Buffer.from(data))),
-        inflateRaw: (data) => new Uint8Array(zlib.inflateRawSync(Buffer.from(data))),
-      },
-      abiProvider: {
-        getAbi: async (account) => (await api.getAbi(account))
-      }
-    }
-    console.log('AMIHDEBUG esr, req body::', req.body);
-    /////////////////////////////////////////////////////////////////////////////////
-    async function main() {
-      console.log('[main][0]');
-      const actions = [
-        {
-          "account": "eosio",
-          "name": "newaccount",
-          "authorization": [{
-            "actor": "............1",
-            "permission": "............2"
-          }],
-          "data": {
-            "creator": "............1",
-            "name": req.body.accountName,
-            "owner": {
-              "threshold": 1,
-              "keys": [],
-              "accounts": [{
-              "permission": {
-                "actor": req.body.custodianAccountName,
-                "permission": "active"
-              },
-              "weight": 1
-              }],
-              "waits": []
-            },
-            "active": {
-              "threshold": 1,
-              "keys": [{
-                // "key": "EOS59RyoSWy4Gq8GJQYEVABj974cYaVo7Z7UcL8AK4Hsjg9p2Gu2i",// TODO: AMIHDEBUG temporary replaced with old type of pubkey just for testing...//req.body.pubkey,
-                "key": req.body.pubkey,
-                "weight": 1
-              }],
-              "accounts": [],
-              "waits": []
-            }
-            },
-          },
-          {
-            "account": "eosio",
-            "name": "buyrambytes",
-            "authorization": [{
-            "actor": "............1",
-            "permission": "............2"
-          }],
-          "data": {
-            "payer": "............1",
-            "receiver": req.body.accountName,
-            "bytes": 3200
-          },
-        },
-        {
-          "account": "eosio",
-          "name": "delegatebw",
-          "authorization": [{
-            "actor": "............1",
-            "permission": "............2"
-          }],
-          "data": {
-            "from": "............1",
-            "receiver": req.body.accountName,
-            "stake_net_quantity": "0.0100 EOS",
-            "stake_cpu_quantity": "0.0100 EOS",
-            "transfer": 0
-          },
-        }
-        // ,
-        // {
-        //   "account": "eosio.token",
-        //   "name": "transfer",
-        //   "authorization": [{
-        //   "actor": "............1",
-        //   "permission": "............2"
-        // }],
-        // "data": {
-        //   "from": "............1",
-        //   "to": req.params.accountname,
-        //   "quantity": req.params.initialamount + ' EOS',
-        //   "memo": configFile.siteHeader
-        // }
-        // }
-      ];
-      console.log('[main][1] actions:::', JSON.stringify(actions, null, 2));
-      const request = await SigningRequest.create({ actions, chainId: '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840' }, opts);
-      const uri = request.encode();
-      console.log(`\n[AMIHDEBUG][request ESR:::][URI]: ${ uri }`)
-      res.status(200).send({ esr: uri });
-    }
-    main().catch(console.error)  
-    /////////////////////////////////////////////////////////////////////////////////
-  } catch(err){
-    console.log('Err in server_prepareEsr:', err);
-  }
-});
+// const jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
+// app.post("/prepareEsr", (req, res) => {
+//   try{
+//     const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+//     const textEncoder = new TextEncoder();
+//     const textDecoder = new TextDecoder();
+//     const api = new Api({ rpc, textDecoder, textEncoder });
+//     const opts = {
+//       textEncoder,
+//       textDecoder,
+//       zlib: {
+//         deflateRaw: (data) => new Uint8Array(zlib.deflateRawSync(Buffer.from(data))),
+//         inflateRaw: (data) => new Uint8Array(zlib.inflateRawSync(Buffer.from(data))),
+//       },
+//       abiProvider: {
+//         getAbi: async (account) => (await api.getAbi(account))
+//       }
+//     }
+//     console.log('AMIHDEBUG esr, req body::', req.body);
+//     /////////////////////////////////////////////////////////////////////////////////
+//     async function main() {
+//       console.log('[main][0]');
+//       const actions = [
+//         {
+//           "account": "eosio",
+//           "name": "newaccount",
+//           "authorization": [{
+//             "actor": "............1",
+//             "permission": "............2"
+//           }],
+//           "data": {
+//             "creator": "............1",
+//             "name": req.body.accountName,
+//             "owner": {
+//               "threshold": 1,
+//               "keys": [],
+//               "accounts": [{
+//               "permission": {
+//                 "actor": req.body.custodianAccountName,
+//                 "permission": "active"
+//               },
+//               "weight": 1
+//               }],
+//               "waits": []
+//             },
+//             "active": {
+//               "threshold": 1,
+//               "keys": [{
+//                 // "key": "EOS59RyoSWy4Gq8GJQYEVABj974cYaVo7Z7UcL8AK4Hsjg9p2Gu2i",// TODO: AMIHDEBUG temporary replaced with old type of pubkey just for testing...//req.body.pubkey,
+//                 "key": req.body.pubkey,
+//                 "weight": 1
+//               }],
+//               "accounts": [],
+//               "waits": []
+//             }
+//             },
+//           },
+//           {
+//             "account": "eosio",
+//             "name": "buyrambytes",
+//             "authorization": [{
+//             "actor": "............1",
+//             "permission": "............2"
+//           }],
+//           "data": {
+//             "payer": "............1",
+//             "receiver": req.body.accountName,
+//             "bytes": 3200
+//           },
+//         },
+//         {
+//           "account": "eosio",
+//           "name": "delegatebw",
+//           "authorization": [{
+//             "actor": "............1",
+//             "permission": "............2"
+//           }],
+//           "data": {
+//             "from": "............1",
+//             "receiver": req.body.accountName,
+//             "stake_net_quantity": "0.0100 EOS",
+//             "stake_cpu_quantity": "0.0100 EOS",
+//             "transfer": 0
+//           },
+//         }
+//         // ,
+//         // {
+//         //   "account": "eosio.token",
+//         //   "name": "transfer",
+//         //   "authorization": [{
+//         //   "actor": "............1",
+//         //   "permission": "............2"
+//         // }],
+//         // "data": {
+//         //   "from": "............1",
+//         //   "to": req.params.accountname,
+//         //   "quantity": req.params.initialamount + ' EOS',
+//         //   "memo": configFile.siteHeader
+//         // }
+//         // }
+//       ];
+//       console.log('[main][1] actions:::', JSON.stringify(actions, null, 2));
+//       const request = await SigningRequest.create({ actions, chainId: '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840' }, opts);
+//       const uri = request.encode();
+//       console.log(`\n[AMIHDEBUG][request ESR:::][URI]: ${ uri }`)
+//       res.status(200).send({ esr: uri });
+//     }
+//     main().catch(console.error)  
+//     /////////////////////////////////////////////////////////////////////////////////
+//   } catch(err){
+//     console.log('Err in server_prepareEsr:', err);
+//   }
+// });
 app.get("/checkAvailability/:name", (req, res) => {
   const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
   // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
   (async () => {
     try{
-      console.log('AMIHDEBUG [checkAvail][name]-====>>>', req.params.name);
       var acc = await rpc.get_account(req.params.name);
       console.log('ACCOUNT:::', acc);
       res.status(200).send({ available: false });
