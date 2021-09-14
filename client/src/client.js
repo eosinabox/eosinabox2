@@ -191,18 +191,28 @@ $(() => {
     const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
     console.log('from, to, quant, memo:', from, to, quantity, memo);
-    const result = await api.transact({
-      actions: [{
-        account: 'eosio.token',
-        name: 'transfer',
-        data: { from, to, quantity, memo },
-        authorization: [{ actor: from, permission: 'active' }],
-      }],
-    }, {
-      blocksBehind: 3,
-      expireSeconds: 60,
-    });
-    consoleLog( {logMsg: 'transfer EOS!', result } );
+    try {
+      const result = await api.transact({
+        actions: [{
+          account: 'eosio.token',
+          name: 'transfer',
+          data: { from, to, quantity, memo },
+          authorization: [{ actor: from, permission: 'active' }],
+        }],
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 60,
+      });
+      consoleLog( {logMsg: 'transfer EOS!', result } );
+      $('#eosinabox_transfer_from'    ).val('');
+      $('#eosinabox_transfer_to'      ).val('');
+      $('#eosinabox_transfer_quantity').val('');
+      $('#eosinabox_transfer_memo'    ).val('');
+      alert('Transaction sent, we need to update the balance here...');
+    } catch (error) {
+      consoleLog( {logMsg: 'transfer EOS error!', error } );
+      alert('Transaction failed with error, ' + error.message);
+    }
     ///////////////////////////////////////////////////
   });
   ///////////////////////////////////////////////////////////////////////////////////
