@@ -111,7 +111,7 @@ $(() => {
     const randomStringFromServer = 'replayAttackProtectionRandomStringNotNeeded?';
     const rp = {
       name: "Ami Heines",
-      id: "amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com (move out to a config .json file?)
+      id: "eosinabox.amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com (move out to a config .json file?)
     };
     const accName = $('#eosinabox_accountName').val();
     const publicKeyCredentialCreationOptions = {
