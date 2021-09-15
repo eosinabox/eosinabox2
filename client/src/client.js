@@ -163,11 +163,11 @@ $(() => {
       if( !localStorage['eosinabox_pubkeys_jungle3'] ){
         localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }else{
-        // save just the new key, distroy the older ones!
-        // let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
-        // o.push({ credentialId: credentialIdHex, key: data.pubkey });
-        // localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
-        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
+        let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
+        o.push({ credentialId: credentialIdHex, key: data.pubkey });
+        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
+        // save just the new key, destroy the older ones!
+        // localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }
       checkIfAllConditionsMet();
       await consoleLog( data );

@@ -42,12 +42,17 @@ app.post("/consoleLog", (req, res) => {
 });
 app.post("/getNewPubKey", async (req, res) => {
   try {
-    console.log('AMIHDEBUG getNewPubKey [0] req.body.rpid:', req.body.rpid);
-    console.log('AMIHDEBUG getNewPubKey [0] req.body.id:', req.body.id);
-    console.log('AMIHDEBUG getNewPubKey [0] req.body.attestationObject.substr(0,80):', req.body.attestationObject.substr(0,180));
-    console.log('AMIHDEBUG getNewPubKey [0] req.body.clientDataJSON.substr(0,80):', req.body.clientDataJSON.substr(0,180));
-    // // decode the clientDataJSON into a utf-8 string
+    console.log('AMIHDEBUG getNewPubKey [0] req.body.rpid, req.body.id:', req.body.rpid, req.body.id);
     // https://medium.com/webauthnworks/verifying-fido2-responses-4691288c8770
+    // User information is stored in authData. AuthData is a rawBuffer struct:
+    // 32/32: RPID hash, hash of the rpId which is basically the effective domain or host
+    //  1/33: flags, State of authenticator during authentication. Bits 0 and 2 are User Presence and User Verification flags. Bit 6 is AT(Attested Credential Data). Must be set when attestedCredentialData is presented. Bit 7 must be set if extension data is presented.
+    //  4/37: counter
+    //     AttestedCredentialData:
+    // 16/53: AAGUID
+    //  2/55: CredID Len
+    //  X/55+X: CredID
+    // 77: COSE PubKey
     const utf8Decoder = new TextDecoder('utf-8');
     const decodedClientData = utf8Decoder.decode( Serialize.hexToUint8Array(req.body.clientDataJSON) );
     const clientDataObj = JSON.parse(decodedClientData);
@@ -106,7 +111,8 @@ app.post("/getNewPubKey", async (req, res) => {
         data: compact,
     });
     console.log('AMIHDEBUG [6] key: ', key)
-    res.status(200).send({pubkey: key, x: JSON.stringify(x), y: JSON.stringify(y)});
+    // res.status(200).send({pubkey: key, x: JSON.stringify(x), y: JSON.stringify(y)});
+    res.status(200).send({ pubkey: key });
   } catch (error) {
     console.log('error in [getNewPubKey]', error)
     res.status(200).send({ msg: 'error in getNewPubKey' });
