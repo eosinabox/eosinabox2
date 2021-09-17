@@ -283,7 +283,7 @@ $(() => {
         expireSeconds: 60,
       });
       consoleLog( {logMsg: 'createdAccount!', result } );
-      alert('Transaction sent, let the otehr person know you created their account');
+      alert('Transaction sent, let the other person know you created their account');
       localStorage.sharedInfo = '';
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
@@ -368,6 +368,9 @@ $(() => {
   //     consoleLog(err);
   //   });
   // });
+  $('#eosinabox_share_backup_debug').on('click', (e)=>{
+    navigator.share({ text: JSON.stringify(localStorage) });
+  });
   $('#eosinabox_share').on('click', (e)=>{
     gState.shareEssentials = {
       custodianAccountName: $('#eosinabox_custodianAccountName').val(),
@@ -381,7 +384,7 @@ $(() => {
   });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
-    $('#eosinabox_transfer_from'    ).val(localStorage.currentAccount);
+    $('#eosinabox_transfer_from').val(localStorage.currentAccount);
     $('.navbar-collapse').collapse('hide');
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
