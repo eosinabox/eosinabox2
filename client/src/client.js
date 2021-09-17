@@ -309,7 +309,7 @@ $(() => {
         actions: [{
           account: 'eosio.token',
           name: 'transfer',
-          data: { localStorage.currentAccount, to, quantity, memo },
+          data: { from: localStorage.currentAccount, to, quantity, memo },
           authorization: [{ actor: localStorage.currentAccount, permission: 'active' }],
         }],
       }, {
