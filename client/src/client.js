@@ -417,7 +417,7 @@ $(() => {
     ].join(' ');
     $(`.eosinabox_sharedinfo_cleos`).html(cleosCommand);
     $(`.eosinabox_page_sharedInfo`).show();
-    document.location.hash = '';
+    history.pushState('', '', window.location.pathname); // document.location.hash = '';
   }else{
     $(`.eosinabox_page_myAccount`).show();
   }
