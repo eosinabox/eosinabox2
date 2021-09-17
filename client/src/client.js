@@ -392,6 +392,12 @@ $(() => {
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
   });
+  $('#eosinabox_transfer_from').on('click', () => {
+    $('#eosinabox_transfer_from').val('...');
+    setTimeout(()=>{
+      $('#eosinabox_transfer_from').val(localStorage.currentAccount);
+    }, 1500);
+  });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
     $('#eosinabox_transfer_from').val(localStorage.currentAccount);
