@@ -259,7 +259,7 @@ $(() => {
           }],
           data: {
             payer: localStorage.currentAccount,
-            receiver: 'mynewaccount',
+            receiver: o.accountName,
             bytes: 3200,
           },
         },
