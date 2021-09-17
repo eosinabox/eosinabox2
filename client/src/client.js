@@ -299,7 +299,6 @@ $(() => {
     const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     console.log('[eosinbox_signTransaction] [click] [5]');
-    $('#eosinabox_transfer_from'    ).val(localStorage.currentAccount);
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
     const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
@@ -370,6 +369,7 @@ $(() => {
   });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
+    $('#eosinabox_transfer_from'    ).val(localStorage.currentAccount);
     $('.navbar-collapse').collapse('hide');
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
