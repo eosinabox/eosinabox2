@@ -179,6 +179,115 @@ $(() => {
     });
   });
   ///////////////////////////////////////////////////////////////////////////////////
+  $('#eosinbox_declineTransaction').on('click', async (event) => {
+    alert('Deleting this transaction.');
+    localStorage.sharedInfo = '';
+    $('.eosinabox_page').hide();
+    $(`.eosinabox_page_myAccount`).show();
+  });
+  $('#eosinbox_approveThisTransaction').on('click', async (event) => {
+    event.preventDefault();
+    const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
+    signatureProvider.keys.clear();
+    const keys = JSON.parse( localStorage.eosinabox_pubkeys_jungle3 );
+    for (const key of keys){
+      signatureProvider.keys.set(key.key, key.credentialId);
+    }
+    const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
+    const api = new eosjs_api.Api({ rpc, signatureProvider });
+    console.log('[eosinbox_approveThisTransaction] [sharedInfo]' + localStorage.sharedInfo);
+    let o = JSON.parse(localStorage.sharedInfo);
+    // https://eosinabox.amiheines.com/#sharedInfo?
+    // action=createAccount&
+    // chain=jungle3&
+    // accountName=cggdggffgyft&
+    // custodianAccountName=webauthn1111&
+    // pubkey=PUB_WA_AwTqYqJEwQ3B4bzNGyxHT25qZCxRfrjgYnshr97otStVYZJ7uA5EAkEey2RoKZCyu7pxaAStoGV1ieCc3tUk
+    console.log('[eosinbox_approveThisTransaction] sharedInfo:', o);
+    try {
+      const result = await api.transact({
+        // actions: [{
+        //   account: 'eosio.token',
+        //   name: 'transfer',
+        //   data: { from, to, quantity, memo },
+        //   authorization: [{ actor: from, permission: 'active' }],
+        // }],
+        actions: [{
+          account: 'eosio',
+          name: o.accountName,
+          authorization: [{
+            actor: localStorage.currentAccount,
+            permission: 'active',
+          }],
+          data: {
+            creator: localStorage.currentAccount,
+            name: o.accountName,
+            owner: {
+              threshold: 1,
+              keys: [],
+              accounts: [{
+                permission: {
+                  actor: o.custodianAccountName,
+                  permission: 'active'
+                },
+                weight: 1
+              }],
+              waits: []
+            },
+            active: {
+              threshold: 1,
+              keys: [{
+                key: o.pubkey,
+                weight: 1
+              }],
+              accounts: [],
+              waits: []
+            },
+          },
+        },
+        {
+          account: 'eosio',
+          name: 'buyrambytes',
+          authorization: [{
+            actor: localStorage.currentAccount,
+            permission: 'active',
+          }],
+          data: {
+            payer: localStorage.currentAccount,
+            receiver: 'mynewaccount',
+            bytes: 3200,
+          },
+        },
+        {
+          account: 'eosio',
+          name: 'delegatebw',
+          authorization: [{
+            actor: localStorage.currentAccount,
+            permission: 'active',
+          }],
+          data: {
+            from: localStorage.currentAccount,
+            receiver: localStorage.currentAccount,
+            stake_net_quantity: '0.0010 EOS',
+            stake_cpu_quantity: '0.0010 EOS',
+            transfer: false,
+          }
+        }]
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 60,
+      });
+      consoleLog( {logMsg: 'createdAccount!', result } );
+      alert('Transaction sent, let the otehr person know you created their account');
+      localStorage.sharedInfo = '';
+      $('.eosinabox_page').hide();
+      $(`.eosinabox_page_myAccount`).show();
+    } catch (error) {
+      consoleLog( {logMsg: 'transfer EOS error!', error } );
+      alert('Transaction failed with error, ' + error.message);
+    }
+  });
+  ///////////////////////////////////////////////////////////////////////////////////
   $('#eosinabox_transfer_transact').on('click', async (event) => {
     event.preventDefault();
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
@@ -190,25 +299,24 @@ $(() => {
     const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     console.log('[eosinbox_signTransaction] [click] [5]');
-    const from     = $('#eosinabox_transfer_from'    ).val().toLowerCase();
+    $('#eosinabox_transfer_from'    ).val(localStorage.currentAccount);
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
     const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
-    console.log('from, to, quant, memo:', from, to, quantity, memo);
+    console.log('from, to, quant, memo:', localStorage.currentAccount, to, quantity, memo);
     try {
       const result = await api.transact({
         actions: [{
           account: 'eosio.token',
           name: 'transfer',
-          data: { from, to, quantity, memo },
-          authorization: [{ actor: from, permission: 'active' }],
+          data: { localStorage.currentAccount, to, quantity, memo },
+          authorization: [{ actor: localStorage.currentAccount, permission: 'active' }],
         }],
       }, {
         blocksBehind: 3,
         expireSeconds: 60,
       });
       consoleLog( {logMsg: 'transfer EOS!', result } );
-      $('#eosinabox_transfer_from'    ).val('');
       $('#eosinabox_transfer_to'      ).val('');
       $('#eosinabox_transfer_quantity').val('');
       $('#eosinabox_transfer_memo'    ).val('');
@@ -217,7 +325,6 @@ $(() => {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       alert('Transaction failed with error, ' + error.message);
     }
-    ///////////////////////////////////////////////////
   });
   ///////////////////////////////////////////////////////////////////////////////////
   // $('#eosinabox_prepareEsr').on('click', (event)=>{
@@ -256,6 +363,7 @@ $(() => {
       accountName:          $('#eosinabox_accountName').val(),
       pubkey:               $('#eosinabox_pubkey').html(),
     };
+    localStorage.currentAccount = $('#eosinabox_accountName').val().toLowerCase();
     navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
@@ -284,11 +392,13 @@ $(() => {
   if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
     var o = {};
+    localStorage.sharedInfo = '';
     for(var i=0; i<params.length; i++){
       var param = params[i].split('=');
       o[param[0]] = param[1];
       $(`.eosinabox_sharedinfo_${param[0]}`).html(param[1]);
     }
+    localStorage.sharedInfo = JSON.stringify(o);
     const cleosCommand = [
       `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
       `_CREATOR_ACCOUNT_ ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
