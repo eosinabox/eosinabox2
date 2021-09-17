@@ -36,8 +36,8 @@ app.get("/client/src/eosjs/dist-web/:filename", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src/eosjs/dist-web', req.params.filename) );
 });
 app.post("/consoleLog", (req, res) => {
+  console.log('[consoleLog][headers]:', req.headers['x-real-ip'] + '; ' + req.headers['user-agent'] + '; ' +   req.headers['referer'] + '; ' +   req.headers['origin'] + '; ');
   console.log('[consoleLog]:::', JSON.stringify(req.body, null, 2));
-  console.log('[consoleLog][headers]:', JSON.stringify(req.headers, null, 2));
   res.status(200).send("ok");
 });
 app.post("/getNewPubKey", async (req, res) => {

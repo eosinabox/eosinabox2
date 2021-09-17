@@ -324,6 +324,7 @@ $(() => {
       $('#eosinabox_transfer_to'      ).val('');
       $('#eosinabox_transfer_quantity').val('');
       $('#eosinabox_transfer_memo'    ).val('');
+      await updateBalance();
       alert('Transaction sent, we need to update the balance here...');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
@@ -387,13 +388,14 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`Blockchain: ${$(e.target).text()} <i class="bi bi-check-circle-fill"></i>`);
   });
   // onLoad
-  $('.eosinabox_page').hide();
-  // if url has #sharedInfo in it, get the parameters and navigate to the right page.
-  (async () => {
+  const updateBalance = async () => {
     const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
     console.log('bal::', balance);
     $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat"></i>` );
-  })();
+  };
+  $('.eosinabox_page').hide();
+  (async () => { await updateBalance(); })();
+  // if url has #sharedInfo in it, get the parameters and navigate to the right page.
   if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
     var o = {};
