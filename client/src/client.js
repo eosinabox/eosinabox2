@@ -293,7 +293,9 @@ $(() => {
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
     signatureProvider.keys.clear();
     const keys = JSON.parse( localStorage.eosinabox_pubkeys_jungle3 );
+    consoleLog({ fromMsg:'eosinabox_transfer_transact [0]', keys });
     for (const key of keys){
+      consoleLog({ fromMsg:'eosinabox_transfer_transact [1]', key });
       signatureProvider.keys.set(key.key, key.credentialId);
     }
     const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
