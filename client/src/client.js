@@ -395,7 +395,7 @@ $(() => {
     $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
   };
   $('.eosinabox_page').hide();
-  try { await updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
+  try { updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
   if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
