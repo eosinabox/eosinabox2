@@ -393,14 +393,14 @@ $(() => {
     });
   });
   $('#eosinabox_transfer_from').on('click', () => {
-    $('#eosinabox_transfer_from').val('...');
+    $('#eosinabox_transfer_from').html('...');
     setTimeout(()=>{
-      $('#eosinabox_transfer_from').val(localStorage.currentAccount);
+      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     }, 1500);
   });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
-    $('#eosinabox_transfer_from').val(localStorage.currentAccount);
+    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     $('.navbar-collapse').collapse('hide');
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
@@ -440,6 +440,6 @@ $(() => {
     history.pushState('', '', window.location.pathname); // delete the share info, so it won't go back again to that page.
   }else{
     $(`.eosinabox_page_myAccount`).show();
-    $('#eosinabox_transfer_from').val(localStorage.currentAccount);
+    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
   }
 });
