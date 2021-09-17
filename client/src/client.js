@@ -298,8 +298,11 @@ $(() => {
       consoleLog({ fromMsg:'eosinabox_transfer_transact [1]', key });
       signatureProvider.keys.set(key.key, key.credentialId);
     }
+    consoleLog({ fromMsg:'eosinabox_transfer_transact [2]' });
     const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
+    consoleLog({ fromMsg:'eosinabox_transfer_transact [3]' });
     const api = new eosjs_api.Api({ rpc, signatureProvider });
+    consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
     console.log('[eosinbox_signTransaction] [click] [5]');
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
     const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
