@@ -214,7 +214,7 @@ $(() => {
         // }],
         actions: [{
           account: 'eosio',
-          name: o.accountName,
+          name: 'newaccount',
           authorization: [{
             actor: localStorage.currentAccount,
             permission: 'active',
@@ -331,6 +331,7 @@ $(() => {
       alert('Transaction failed with error, ' + error.message);
     }
   });
+  $('#eosinabox_balance').on('click', updateBalance);
   ///////////////////////////////////////////////////////////////////////////////////
   // $('#eosinabox_prepareEsr').on('click', (event)=>{
   //   event.preventDefault();
@@ -391,7 +392,7 @@ $(() => {
   const updateBalance = async () => {
     const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
     console.log('bal::', balance);
-    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat"></i>` );
+    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
   };
   $('.eosinabox_page').hide();
   (async () => { await updateBalance(); })();
