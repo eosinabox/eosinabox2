@@ -265,6 +265,20 @@ app.get("/getCurrencyBalance/:code/:account/:symbol", (req, res) => {
     }
   })();
 });
+app.get("/getAccountInfo/:chain/:account", (req, res) => {
+  const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+  (async () => {
+    try{
+      var response = await rpc.get_account(req.params.account);
+      console.log('ACCOUNT[getAccountInfo]:::', response);
+      res.status(200).send(response);
+    }
+    catch(err){
+      console.log('AMIHDEBUG [getAccountInfo] error', err);
+      res.status(200).send({ errMsg: 'getAccountInfo', err });
+    }
+  })();
+});
 /**
  * Server Activation
  */

@@ -108,9 +108,15 @@ $(() => {
     const response = await fetch(`/getCurrencyBalance/${code}/${account}/${symbol}`);
     return response.json();
   }
+  const getAccountInfo = async (chain, account) => {
+    const response = await fetch(`/getAccountInfo/${chain}/${account}`);
+    return response.json();
+  }
   const updateBalance = async () => {
     const balance = await getCurrencyBalance( 'eosio.token', localStorage.currentAccount,'EOS' );
-    console.log('bal::', balance);
+    const accountInfo = await getAccountInfo( 'jungle3', localStorage.currentAccount );
+    // console.log('bal::', balance);
+    consoleLog({ logMsg: 'getAccountInfo', accountInfo, balance });
     $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
   };
   $('#eosinbox_createKeys').on('click', async (event) => {
@@ -403,6 +409,10 @@ $(() => {
   // onLoad
   $('.eosinabox_page').hide();
   try { updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
+  if(typeof(PublicKeyCredential)=='undefined'){
+    alert('Please use a modern browser to use this app.');
+    consoleLog({ errMsg: 'PublicKeyCredential_undefined', message: 'Please use a modern browser to use this app.' });
+  }
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
   if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
@@ -421,8 +431,9 @@ $(() => {
     ].join(' ');
     $(`.eosinabox_sharedinfo_cleos`).html(cleosCommand);
     $(`.eosinabox_page_sharedInfo`).show();
-    history.pushState('', '', window.location.pathname); // document.location.hash = '';
+    history.pushState('', '', window.location.pathname); // delete the share info, so it won't go back again to that page.
   }else{
     $(`.eosinabox_page_myAccount`).show();
+    $('#eosinabox_transfer_from').val(localStorage.currentAccount);
   }
 });
