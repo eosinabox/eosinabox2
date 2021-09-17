@@ -11,6 +11,20 @@ const consoleLog = async (logObj) => {
     body: JSON.stringify(logObj)
   });
 }
+const detectOs = () => {
+  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  // Windows Phone must come first because its UA also contains "Android"
+  if (/windows phone/i.test(userAgent)) {
+    return "windowsphone";
+  }
+  if (/android/i.test(userAgent)) {
+    return "android";
+  }
+  // iOS detection from: http://stackoverflow.com/a/9039885/177710
+  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    return "ios";
+  }
+}
 $(() => {
   window.onerror = function errorHandler(msg, url, line) {
     consoleLog({ logMsg: 'clientSideError', arguments });
@@ -396,7 +410,7 @@ $(() => {
     $('#eosinabox_transfer_from').html('...');
     setTimeout(()=>{
       $('#eosinabox_transfer_from').html(localStorage.currentAccount);
-    }, 1500);
+    }, 500);
   });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
@@ -416,7 +430,12 @@ $(() => {
   $('.eosinabox_page').hide();
   try { updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
   if(typeof(PublicKeyCredential)=='undefined'){
-    alert('Please use a modern browser to use this app.');
+    const os = detectOs();
+    if(os=='ios'){
+      alert('Please use a modern browser, Safari on Apple.');
+    }else{
+      alert('Please use a modern browser, Google Chrome on Android.');
+    }
     consoleLog({ errMsg: 'PublicKeyCredential_undefined', message: 'Please use a modern browser to use this app.' });
   }
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
