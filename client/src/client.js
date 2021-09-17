@@ -11,11 +11,6 @@ const consoleLog = async (logObj) => {
     body: JSON.stringify(logObj)
   });
 }
-const updateBalance = async () => {
-  const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
-  console.log('bal::', balance);
-  $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
-};
 $(() => {
   window.onerror = function errorHandler(msg, url, line) {
     consoleLog({ logMsg: 'clientSideError', arguments });
@@ -113,6 +108,11 @@ $(() => {
     const response = await fetch(`/getCurrencyBalance/${code}/${account}/${symbol}`);
     return response.json();
   }
+  const updateBalance = async () => {
+    const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
+    console.log('bal::', balance);
+    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
+  };
   $('#eosinbox_createKeys').on('click', async (event) => {
     event.preventDefault();
     // AMIHDEBUG TODO: generate random string on server and manage it in a session,
