@@ -109,7 +109,7 @@ $(() => {
     return response.json();
   }
   const updateBalance = async () => {
-    const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
+    const balance = await getCurrencyBalance( 'eosio.token', localStorage.currentAccount,'EOS' );
     console.log('bal::', balance);
     $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
   };
