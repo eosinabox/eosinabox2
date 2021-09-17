@@ -11,6 +11,11 @@ const consoleLog = async (logObj) => {
     body: JSON.stringify(logObj)
   });
 }
+const updateBalance = async () => {
+  const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
+  console.log('bal::', balance);
+  $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
+};
 $(() => {
   window.onerror = function errorHandler(msg, url, line) {
     consoleLog({ logMsg: 'clientSideError', arguments });
@@ -389,11 +394,6 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`Blockchain: ${$(e.target).text()} <i class="bi bi-check-circle-fill"></i>`);
   });
   // onLoad
-  const updateBalance = async () => {
-    const balance = await getCurrencyBalance('eosio.token','webauthntest','EOS');
-    console.log('bal::', balance);
-    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
-  };
   $('.eosinabox_page').hide();
   try { updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
