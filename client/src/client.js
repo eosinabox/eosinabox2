@@ -330,7 +330,7 @@ $(() => {
       $('#eosinabox_transfer_quantity').val('');
       $('#eosinabox_transfer_memo'    ).val('');
       try { await updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:327', error }); }
-      alert('Transaction sent, we need to update the balance here...');
+      alert('Transaction sent');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       alert('Transaction failed with error, ' + error.message);
