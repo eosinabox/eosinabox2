@@ -22,6 +22,14 @@ const port = process.env.PORT || "8000";
 /**
  *  App Configuration
  */
+ // TODO: add dotEnv for external config items
+ // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+ // from https://cryptolions.io/bp.json
+ // http://api.eos.cryptolions.io", "ssl_endpoint": "https://api.eos.cryptolions.io",
+const chain = {
+  jungle3: 'http://jungle3.cryptolions.io:80',
+  eos    : 'http://api.eos.cryptolions.io',
+}
 
 /**
  * Routes Definitions
@@ -45,14 +53,15 @@ app.post("/getNewPubKey", async (req, res) => {
     console.log('AMIHDEBUG getNewPubKey [0] req.body.rpid, req.body.id:', req.body.rpid, req.body.id);
     // https://medium.com/webauthnworks/verifying-fido2-responses-4691288c8770
     // User information is stored in authData. AuthData is a rawBuffer struct:
-    // 32/32: RPID hash, hash of the rpId which is basically the effective domain or host
-    //  1/33: flags, State of authenticator during authentication. Bits 0 and 2 are User Presence and User Verification flags. Bit 6 is AT(Attested Credential Data). Must be set when attestedCredentialData is presented. Bit 7 must be set if extension data is presented.
-    //  4/37: counter
-    //     AttestedCredentialData:
-    // 16/53: AAGUID
-    //  2/55: CredID Len
-    //  X/55+X: CredID
-    // 77: COSE PubKey
+    // len / runningTotal
+    //  32 / 32: RPID hash, hash of the rpId which is basically the effective domain or host
+    //   1 / 33: flags, State of authenticator during authentication. Bits 0 and 2 are User Presence and User Verification flags. Bit 6 is AT(Attested Credential Data). Must be set when attestedCredentialData is presented. Bit 7 must be set if extension data is presented.
+    //   4 / 37: counter
+    //        AttestedCredentialData:
+    //  16 / 53: AAGUID
+    //   2 / 55: CredID Len
+    //   X / 55+X: CredID
+    //  77: COSE PubKey
     const utf8Decoder = new TextDecoder('utf-8');
     const decodedClientData = utf8Decoder.decode( Serialize.hexToUint8Array(req.body.clientDataJSON) );
     const clientDataObj = JSON.parse(decodedClientData);
@@ -121,7 +130,7 @@ app.post("/getNewPubKey", async (req, res) => {
 // const jungle3testnet = '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840';
 // app.post("/prepareEsr", (req, res) => {
 //   try{
-//     const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+//     const rpc = new JsonRpc(chain[req.params.chain], { fetch });
 //     const textEncoder = new TextEncoder();
 //     const textDecoder = new TextDecoder();
 //     const api = new Api({ rpc, textDecoder, textEncoder });
@@ -231,8 +240,8 @@ app.post("/getNewPubKey", async (req, res) => {
 //     console.log('Err in server_prepareEsr:', err);
 //   }
 // });
-app.get("/checkAvailability/:name", (req, res) => {
-  const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+app.get("/checkAvailability/:chain/:name", (req, res) => {
+  const rpc = new JsonRpc(chain[req.params.chain], { fetch });
   // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
   (async () => {
     try{
@@ -251,8 +260,8 @@ app.get("/checkAvailability/:name", (req, res) => {
     }
   })();
 });
-app.get("/getCurrencyBalance/:code/:account/:symbol", (req, res) => {
-  const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+app.get("/getCurrencyBalance/:chain/:code/:account/:symbol", (req, res) => {
+  const rpc = new JsonRpc(chain[req.params.chain], { fetch });
   (async () => {
     try{
       var response = await rpc.get_currency_balance(req.params.code, req.params.account, req.params.symbol);
@@ -266,7 +275,7 @@ app.get("/getCurrencyBalance/:code/:account/:symbol", (req, res) => {
   })();
 });
 app.get("/getAccountInfo/:chain/:account", (req, res) => {
-  const rpc = new JsonRpc('http://jungle3.cryptolions.io:80', { fetch }); // http://jungle3.cryptolions.io:80 https://jungle3.cryptolions.io:443
+  const rpc = new JsonRpc(chain[req.params.chain], { fetch });
   (async () => {
     try{
       var response = await rpc.get_account(req.params.account);

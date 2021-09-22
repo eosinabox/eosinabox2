@@ -1,9 +1,14 @@
 var gState = {
+  chain: 'jungle3',
   accountName: false,
   custodianAccountName: false,
   pubkey: false,
   esr: ''
 };
+const gChain = {
+  jungle3: 'http://jungle3.cryptolions.io:80',
+  eos    : 'http://api.eos.cryptolions.io',
+}
 const consoleLog = async (logObj) => {
   await fetch('/consoleLog', {
     method: 'POST',
@@ -15,15 +20,16 @@ const detectOs = () => {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
   // Windows Phone must come first because its UA also contains "Android"
   if (/windows phone/i.test(userAgent)) {
-    return "windowsphone";
+    return 'windowsphone';
   }
   if (/android/i.test(userAgent)) {
-    return "android";
+    return 'android';
   }
   // iOS detection from: http://stackoverflow.com/a/9039885/177710
   if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-    return "ios";
+    return 'ios';
   }
+  return 'notPhone';
 }
 $(() => {
   window.onerror = function errorHandler(msg, url, line) {
@@ -40,7 +46,7 @@ $(() => {
     $('#eosinabox_countAccountLen').html( (12-len) + ' more characters' );
     if(len == 12){
       $('#eosinabox_countAccountLen').html('Checking if the account name is available...');
-      checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
+      checkIfAccountNameIsAvailable( gState.chain, $('#eosinabox_accountName').val(), res => {
         if(res.accountAvailable){
           gState.accountName = true;
           $('#eosinabox_countAccountLen').html('Account is available');
@@ -54,7 +60,7 @@ $(() => {
   });
   $('#esinabox_check_availability').on('click', (event)=>{
     event.preventDefault();
-    checkIfAccountNameIsAvailable( $('#eosinabox_accountName').val(), res => {
+    checkIfAccountNameIsAvailable( gState.chain, $('#eosinabox_accountName').val(), res => {
       if(res.accountAvailable){
         gState.accountName = true;
         $('#eosinabox_countAccountLen').html('Account is available');
@@ -75,7 +81,7 @@ $(() => {
     $('#eosinabox_countCustodianAccountLen').html( (12-len) + ' more characters' );
     if(len == 12){
       $('#eosinabox_countCustodianAccountLen').html('Checking if the custodian account name exists...');
-      checkIfAccountNameIsAvailable( $('#eosinabox_custodianAccountName').val(), res => {
+      checkIfAccountNameIsAvailable( gState.chain, $('#eosinabox_custodianAccountName').val(), res => {
         if(res.accountAvailable){
           gState.custodianAccountName = false;
           $('#eosinabox_countCustodianAccountLen').html('Custodian Account does not exist, please try again');
@@ -97,7 +103,7 @@ $(() => {
       $('#eosinabox_share').hide();
     }
   }
-  const checkIfAccountNameIsAvailable = (accToCheck, callback) => {
+  const checkIfAccountNameIsAvailable = (chain, accToCheck, callback) => {
     if(accToCheck.length != 12){
       alert(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
       consoleLog( { consoleLog: 'account length failed', accToCheck });
@@ -108,7 +114,7 @@ $(() => {
       return;
     }
     consoleLog( { consoleLog: 'check if account name is available', accToCheck });
-    fetch('/checkAvailability/' + accToCheck)
+    fetch(`/checkAvailability/${chain}/${accToCheck}`)
     .then(response => response.json())
     .then(data => {
       console.log('AMIHDEBUG res--data::', data);
@@ -118,19 +124,23 @@ $(() => {
       console.error('Error in FETCH:', error);
     });
   }
-  const getCurrencyBalance = async (code, account, symbol) => {
-    const response = await fetch(`/getCurrencyBalance/${code}/${account}/${symbol}`);
+  const getCurrencyBalance = async (chain, code, account, symbol) => {
+    if(account==null){ return [ 'No account...' ]; }
+    const response = await fetch(`/getCurrencyBalance/${chain}/${code}/${account}/${symbol}`);
     return response.json();
   }
   const getAccountInfo = async (chain, account) => {
     const response = await fetch(`/getAccountInfo/${chain}/${account}`);
     return response.json();
   }
-  const updateBalance = async () => {
-    const balance = await getCurrencyBalance( 'eosio.token', localStorage.currentAccount,'EOS' );
-    const accountInfo = await getAccountInfo( 'jungle3', localStorage.currentAccount );
+  const updateBalance = async (chain) => {
+    if(chain==null){
+      chain = gState.chain;
+    }
+    const balance = await getCurrencyBalance( chain, 'eosio.token', localStorage.currentAccount,'EOS' );
+    const accountInfo = await getAccountInfo( chain, localStorage.currentAccount );
     // console.log('bal::', balance);
-    consoleLog({ logMsg: 'getAccountInfo', accountInfo, balance });
+    consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
     $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
   };
   $('#eosinbox_createKeys').on('click', async (event) => {
@@ -218,7 +228,7 @@ $(() => {
     for (const key of keys){
       signatureProvider.keys.set(key.key, key.credentialId);
     }
-    const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
+    const rpc = new eosjs_jsonrpc.JsonRpc(gChain[gState.chain]);
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     console.log('[eosinbox_approveThisTransaction] [sharedInfo]' + localStorage.sharedInfo);
     let o = JSON.parse(localStorage.sharedInfo);
@@ -324,7 +334,7 @@ $(() => {
       signatureProvider.keys.set(key.key, key.credentialId);
     }
     consoleLog({ fromMsg:'eosinabox_transfer_transact [2]' });
-    const rpc = new eosjs_jsonrpc.JsonRpc('https://jungle3.cryptolions.io:443');
+    const rpc = new eosjs_jsonrpc.JsonRpc(gChain[gState.chain]);
     consoleLog({ fromMsg:'eosinabox_transfer_transact [3]' });
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
@@ -349,7 +359,7 @@ $(() => {
       $('#eosinabox_transfer_to'      ).val('');
       $('#eosinabox_transfer_quantity').val('');
       $('#eosinabox_transfer_memo'    ).val('');
-      try { await updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:327', error }); }
+      try { await updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:327', error }); }
       alert('Transaction sent');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
@@ -402,7 +412,7 @@ $(() => {
       pubkey:               $('#eosinabox_pubkey').html(),
     };
     localStorage.currentAccount = $('#eosinabox_accountName').val().toLowerCase();
-    navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=${gState.shareEssentials.accountName}` +
+    navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
   });
@@ -424,20 +434,25 @@ $(() => {
   $('.eosinabox_dropdown_blockchain a.dropdown-item').on('click', (e)=>{
     console.log('data-chain:', $(e.target).data('chain'));
     console.log('text: ', $(e.target).text());
-    $('.eosinabox_dropdown_blockchain>button').html(`Blockchain: ${$(e.target).text()} <i class="bi bi-check-circle-fill"></i>`);
+    gState.chain = $(e.target).data('chain').toLowerCase();
+    $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `); // <i class="bi bi-check-circle-fill"></i>
   });
   // onLoad
   $('.eosinabox_page').hide();
-  try { updateBalance(); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
-  if(typeof(PublicKeyCredential)=='undefined'){
+  try { updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
+  if(typeof(PublicKeyCredential)=='undefined'){ // won't work if browser is not modern
     const os = detectOs();
     if(os=='ios'){
-      alert('Please use a modern browser, Safari on Apple.');
+      alert('Please use a modern browser, on Apple that would be Safari.');
     }else{
-      alert('Please use a modern browser, Google Chrome on Android.');
+      alert('Please use a modern browser, on Android that would be Google Chrome.');
     }
     consoleLog({ errMsg: 'PublicKeyCredential_undefined', message: 'Please use a modern browser to use this app.' });
   }
+  // show different page if not on mobile, this will be an explainer about eosinabox.com
+  // if(detectOs() == 'notPhone'){
+  //   window.open('https://eosinabox.com/notPhone', '_self').focus();
+  // }
   // if url has #sharedInfo in it, get the parameters and navigate to the right page.
   if(window.location.href.split('#').length>1 && window.location.href.split('#')[1].substr(0,10) == 'sharedInfo'){
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
@@ -450,7 +465,7 @@ $(() => {
     }
     localStorage.sharedInfo = JSON.stringify(o);
     const cleosCommand = [
-      `cleos -u https://jungle3.cryptolions.io:443 system newaccount`,
+      `cleos -u ${gChain[gState.chain]} system newaccount`,
       `_CREATOR_ACCOUNT_ ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
       `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-kbytes 3`,
     ].join(' ');
