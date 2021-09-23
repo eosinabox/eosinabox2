@@ -6,8 +6,8 @@ var gState = {
   esr: ''
 };
 const gChain = {
-  jungle3: 'http://jungle3.cryptolions.io:80',
-  eos    : 'http://api.eos.cryptolions.io',
+  jungle3: 'https://jungle3.cryptolions.io',
+  eos    : 'https://api.eos.cryptolions.io',
 }
 const getCurrentAccountName = () => {
   const part = localStorage.currentAccount.split(':');
