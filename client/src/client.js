@@ -405,6 +405,19 @@ $(() => {
   $('#eosinabox_share_backup_debug').on('click', (e)=>{
     navigator.share({ text: JSON.stringify(localStorage) });
   });
+
+  $('.eosinabox_share_inviteFriend').on('click', (e)=>{
+    gState.shareEssentials = {
+      custodianAccountName: $('#eosinabox_custodianAccountNameInvite').val(),
+    };
+    const shareInfo = {
+      url: `https://eosinabox.amiheines.com/#sharedInfo?action=` +
+      `inviteToCreateAccount&chain=${gState.chain}` +
+      `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
+    }
+    navigator.share();
+  });
+
   $('#eosinabox_share').on('click', (e)=>{
     gState.shareEssentials = {
       custodianAccountName: $('#eosinabox_custodianAccountName').val(),
