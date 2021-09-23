@@ -398,9 +398,12 @@ $(() => {
   //     consoleLog(err);
   //   });
   // });
-  $('#eosinabox_viewOnExplorer').on('click', (e)=>{
-    // jungle only for now... TODO: AMIHDEBUG expand this!
-    window.open('https://jungle3.bloks.io/account/' + localStorage.currentAccount, '_blank').focus();
+  $('.eosinabox_viewOnExplorer').on('click', (e)=>{
+    if(gState.chain=='eos'){
+      window.open('https://bloks.io/account/' + localStorage.currentAccount, '_blank').focus();
+    }else{
+      window.open('https://jungle3.bloks.io/account/' + localStorage.currentAccount, '_blank').focus();
+    }
   });
   $('#eosinabox_share_backup_debug').on('click', (e)=>{
     navigator.share({ text: JSON.stringify(localStorage) });
