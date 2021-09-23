@@ -408,7 +408,7 @@ $(() => {
 
   $('.eosinabox_share_inviteFriend').on('click', (e)=>{
     gState.shareEssentials = {
-      custodianAccountName: $('#eosinabox_custodianAccountNameInvite').val(),
+      custodianAccountName: $('.eosinabox_custodianAccountNameInvite').val(),
     };
     const shareInfo = {
       url: `https://eosinabox.amiheines.com/#sharedInfo?action=` +
@@ -451,7 +451,6 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `); // <i class="bi bi-check-circle-fill"></i>
   });
   // onLoad
-  $('.eosinabox_page').hide();
   try { updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
   if(typeof(PublicKeyCredential)=='undefined'){ // won't work if browser is not modern
     const os = detectOs();
@@ -477,15 +476,35 @@ $(() => {
       $(`.eosinabox_sharedinfo_${param[0]}`).html(param[1]);
     }
     localStorage.sharedInfo = JSON.stringify(o);
-    const cleosCommand = [
-      `cleos -u ${gChain[gState.chain]} system newaccount`,
-      `_CREATOR_ACCOUNT_ ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
-      `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-kbytes 3`,
-    ].join(' ');
-    $(`.eosinabox_sharedinfo_cleos`).html(cleosCommand);
-    $(`.eosinabox_page_sharedInfo`).show();
     history.pushState('', '', window.location.pathname); // delete the share info, so it won't go back again to that page.
+    // full share of create account OR partial share of invite friend?
+    // https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=aminewphone1&custodianAccountName=webauthntest&pubkey=PUB_WA_9vAuvYoJ3iWMKp9hEwfRaz645GQZ89F4w1e6XA4DCQGTh4aQwtQVNQ9MGVYbGa48suGGAuDZPpuFmjHEKvzp
+    // https://eosinabox.amiheines.com/#sharedInfo?action=inviteToCreateAccount&chain=jungle3&custodianAccountName=undefined
+    if(o.action == 'createAccount'){
+      const cleosCommand = [
+        `cleos -u ${gChain[gState.chain]} system newaccount`,
+        `_CREATOR_ACCOUNT_ ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
+        `--stake-net "0.0010 EOS" --stake-cpu "0.0010 EOS" --buy-ram-kbytes 3`,
+      ].join(' ');
+      $(`.eosinabox_sharedinfo_cleos`).html(cleosCommand);
+      $('.eosinabox_page').hide();
+      $(`.eosinabox_page_sharedInfo`).show();
+    }else if(o.action == 'inviteToCreateAccount'){
+      gState.chain = o.chain;
+      $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
+      $('.eosinabox_dropdown_blockchain button').html(o.chain);
+      $('.eosinabox_custodianAccountNameInvite').val(o.custodianAccountName);
+      $('.eosinabox_page').hide();
+      $(`.eosinabox_page_createAccount`).show();
+    }else{
+      // default - unknown...
+      $('.eosinabox_page').hide();
+      $(`.eosinabox_page_myAccount`).show();
+      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+    }
   }else{
+    // plain onLoad, go to home page
+    $('.eosinabox_page').hide();
     $(`.eosinabox_page_myAccount`).show();
     $('#eosinabox_transfer_from').html(localStorage.currentAccount);
   }
