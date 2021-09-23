@@ -167,7 +167,7 @@ $(() => {
     const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
     // console.log('bal::', balance);
     consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
-    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i><i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
+    $('#eosinabox_balance').html( `${balance} <i class="eosinabox_refresh bi bi-arrow-repeat h6"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
   };
   $('#eosinbox_createKeys').on('click', async (event) => {
     event.preventDefault();
@@ -392,7 +392,6 @@ $(() => {
       alert('Transaction failed with error, ' + error.message);
     }
   });
-  $('#eosinabox_balance').on('click', updateBalance);
   ///////////////////////////////////////////////////////////////////////////////////
   // $('#eosinabox_prepareEsr').on('click', (event)=>{
   //   event.preventDefault();
@@ -424,8 +423,10 @@ $(() => {
   //     consoleLog(err);
   //   });
   // });
-  $('.eosinabox_viewOnExplorer').on('click', (e)=>{
-    if(getCurrentAccountChain()=='eos'){
+  $('#eosinabox_balance').on('click', '#eosinabox_balance,.eosinabox_refresh', updateBalance);
+  // $('.eosinabox_viewOnExplorer').on('click', (e)=>{
+  $('#eosinabox_balance').on('click', '.eosinabox_viewOnExplorer', (e)=>{
+      if(getCurrentAccountChain()=='eos'){
       window.open('https://bloks.io/account/' + getCurrentAccountName(), '_blank').focus();
     }else{
       window.open('https://jungle3.bloks.io/account/' + getCurrentAccountName(), '_blank').focus();
