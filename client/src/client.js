@@ -258,6 +258,7 @@ $(() => {
     localStorage.sharedInfo = '';
     $('.eosinabox_page').hide();
     $(`.eosinabox_page_myAccount`).show();
+    $('#eosinabox_transfer_from').html(getCurrentAccountName());
   });
   $('#eosinbox_approveThisTransaction').on('click', async (event) => {
     event.preventDefault();
@@ -356,6 +357,7 @@ $(() => {
       localStorage.sharedInfo = '';
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
+      $('#eosinabox_transfer_from').html(getCurrentAccountName());
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       alert('Transaction failed with error, ' + error.message);
