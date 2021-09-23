@@ -491,9 +491,10 @@ $(() => {
       $(`.eosinabox_page_sharedInfo`).show();
     }else if(o.action == 'inviteToCreateAccount'){
       gState.chain = o.chain;
+      console.log('[onLoad][invite][1] o:', o);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
-      $('.eosinabox_custodianAccountNameInvite').val(o.custodianAccountName);
+      $('#eosinabox_custodianAccountName').val(o.custodianAccountName);
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_createAccount`).show();
     }else{
