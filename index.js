@@ -240,26 +240,26 @@ app.post("/getNewPubKey", async (req, res) => {
 //     console.log('Err in server_prepareEsr:', err);
 //   }
 // });
-app.get("/checkAvailability/:chain/:name", (req, res) => {
-  const rpc = new JsonRpc(chain[req.params.chain], { fetch });
-  // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-  (async () => {
-    try{
-      var acc = await rpc.get_account(req.params.name);
-      console.log('ACCOUNT:::', acc);
-      res.status(200).send({ available: false });
-    }
-    catch(err){
-      if(!!err.details && !!err.details[0].message && err.details[0].message.substr(0,11) == 'unknown key'){
-        console.log('Account not found - great news!!');
-        res.status(200).send({ available: true });
-      }else{
-        console.log('AMIHDEBUG error, account not found??', err);
-        res.status(200).send({ available: false });
-      }
-    }
-  })();
-});
+// app.get("/checkAvailability/:chain/:name", (req, res) => {
+//   const rpc = new JsonRpc(chain[req.params.chain], { fetch });
+//   // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
+//   (async () => {
+//     try{
+//       var acc = await rpc.get_account(req.params.name);
+//       console.log('ACCOUNT:::', acc);
+//       res.status(200).send({ available: false });
+//     }
+//     catch(err){
+//       if(!!err.details && !!err.details[0].message && err.details[0].message.substr(0,11) == 'unknown key'){
+//         console.log('Account not found - great news!!');
+//         res.status(200).send({ available: true });
+//       }else{
+//         console.log('AMIHDEBUG error, account not found??', err);
+//         res.status(200).send({ available: false });
+//       }
+//     }
+//   })();
+// });
 app.get("/getCurrencyBalance/:chain/:code/:account/:symbol", (req, res) => {
   const rpc = new JsonRpc(chain[req.params.chain], { fetch });
   (async () => {

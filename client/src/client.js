@@ -129,7 +129,7 @@ $(() => {
       $('#eosinabox_share').hide();
     }
   }
-  const checkIfAccountNameIsAvailable = (chain, accToCheck, callback) => {
+  const checkIfAccountNameIsAvailable = async (chain, accToCheck, callback) => {
     if(accToCheck.length != 12){
       alert(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
       consoleLog( { consoleLog: 'account length failed', accToCheck });
@@ -140,15 +140,21 @@ $(() => {
       return;
     }
     consoleLog( { consoleLog: 'check if account name is available', accToCheck });
-    fetch(`/checkAvailability/${chain}/${accToCheck}`)
-    .then(response => response.json())
-    .then(data => {
-      console.log('AMIHDEBUG res--data::', data);
-      callback({ accountAvailable: !!data.available });
-    })
-    .catch((error) => {
-      console.error('Error in FETCH:', error);
-    });
+    const rpc = new JsonRpc(gChain[chain], { fetch });
+    try{
+      let acc = await rpc.get_account(req.params.name);
+      console.log('ACCOUNT:::', acc);
+      callback({ accountAvailable: false });
+    }
+    catch(err){
+      if(!!err.details && !!err.details[0].message && err.details[0].message.substr(0,11) == 'unknown key'){
+        console.log('Account not found - great news!!');
+        res.status(200).send({ available: true });
+      }else{
+        console.log('AMIHDEBUG error, account not found??', err);
+        callback({ accountAvailable: false });
+      }
+    }
   }
   const getCurrencyBalance = async (chain, code, account, symbol) => {
     if(account==null){ return [ 'No account...' ]; }
@@ -160,9 +166,10 @@ $(() => {
     return response.json();
   }
   const updateBalance = async (chain) => {
-    if(chain==null){
+    if((typeof chain=='object') || chain==null){
       chain = gState.chain;
     }
+    if(!chain){ chain = 'jungle3'; } // still no chain?? fall back to jungle3
     const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
     const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
     // console.log('bal::', balance);
