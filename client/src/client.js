@@ -140,7 +140,7 @@ $(() => {
       return;
     }
     consoleLog( { consoleLog: 'check if account name is available', accToCheck });
-    const rpc = new JsonRpc(gChain[chain], { fetch });
+    const rpc = new eosjs_jsonrpc.JsonRpc(gChain[chain]);
     try{
       let acc = await rpc.get_account(req.params.name);
       console.log('ACCOUNT:::', acc);
