@@ -9,6 +9,32 @@ const gChain = {
   jungle3: 'http://jungle3.cryptolions.io:80',
   eos    : 'http://api.eos.cryptolions.io',
 }
+const getCurrentAccountName = () => {
+  const part = localStorage.currentAccount.split(':');
+  // empty? new client phone, no account yet
+  // just one element? old format, no chain prefix
+  // 2 parts? eosChain:accountname
+  if(part.length==0){
+    return 'no account yet...'
+  }else if(part.length==1){
+    return part[0];
+  }else{
+    return part[1];
+  }
+}
+const getCurrentAccountChain = () => {
+  const part = localStorage.currentAccount.split(':');
+  // empty? new client phone, no account yet
+  // just one element? old format, no chain prefix, so must be jungle3
+  // 2 parts? eosChain:accountname
+  if(part.length==0){
+    return 'no account yet...'
+  }else if(part.length==1){
+    return 'jungle3';
+  }else{
+    return part[0];
+  }
+}
 const consoleLog = async (logObj) => {
   await fetch('/consoleLog', {
     method: 'POST',
@@ -137,8 +163,8 @@ $(() => {
     if(chain==null){
       chain = gState.chain;
     }
-    const balance = await getCurrencyBalance( chain, 'eosio.token', localStorage.currentAccount,'EOS' );
-    const accountInfo = await getAccountInfo( chain, localStorage.currentAccount );
+    const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
+    const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
     // console.log('bal::', balance);
     consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
     $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
@@ -251,11 +277,11 @@ $(() => {
           account: 'eosio',
           name: 'newaccount',
           authorization: [{
-            actor: localStorage.currentAccount,
+            actor: getCurrentAccountName(),
             permission: 'active',
           }],
           data: {
-            creator: localStorage.currentAccount,
+            creator: getCurrentAccountName(),
             name: o.accountName,
             owner: {
               threshold: 1,
@@ -284,11 +310,11 @@ $(() => {
           account: 'eosio',
           name: 'buyrambytes',
           authorization: [{
-            actor: localStorage.currentAccount,
+            actor: getCurrentAccountName(),
             permission: 'active',
           }],
           data: {
-            payer: localStorage.currentAccount,
+            payer: getCurrentAccountName(),
             receiver: o.accountName,
             bytes: 3200,
           },
@@ -297,12 +323,12 @@ $(() => {
           account: 'eosio',
           name: 'delegatebw',
           authorization: [{
-            actor: localStorage.currentAccount,
+            actor: getCurrentAccountName(),
             permission: 'active',
           }],
           data: {
-            from: localStorage.currentAccount,
-            receiver: localStorage.currentAccount,
+            from: getCurrentAccountName(),
+            receiver: getCurrentAccountName(),
             stake_net_quantity: '0.0010 EOS',
             stake_cpu_quantity: '0.0010 EOS',
             transfer: false,
@@ -334,7 +360,7 @@ $(() => {
       signatureProvider.keys.set(key.key, key.credentialId);
     }
     consoleLog({ fromMsg:'eosinabox_transfer_transact [2]' });
-    const rpc = new eosjs_jsonrpc.JsonRpc(gChain[gState.chain]);
+    const rpc = new eosjs_jsonrpc.JsonRpc(gChain[getCurrentAccountChain()]);
     consoleLog({ fromMsg:'eosinabox_transfer_transact [3]' });
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
@@ -348,8 +374,8 @@ $(() => {
         actions: [{
           account: 'eosio.token',
           name: 'transfer',
-          data: { from: localStorage.currentAccount, to, quantity, memo },
-          authorization: [{ actor: localStorage.currentAccount, permission: 'active' }],
+          data: { from: getCurrentAccountName(), to, quantity, memo },
+          authorization: [{ actor: getCurrentAccountName(), permission: 'active' }],
         }],
       }, {
         blocksBehind: 3,
@@ -399,10 +425,10 @@ $(() => {
   //   });
   // });
   $('.eosinabox_viewOnExplorer').on('click', (e)=>{
-    if(gState.chain=='eos'){
-      window.open('https://bloks.io/account/' + localStorage.currentAccount, '_blank').focus();
+    if(getCurrentAccountChain()=='eos'){
+      window.open('https://bloks.io/account/' + getCurrentAccountName(), '_blank').focus();
     }else{
-      window.open('https://jungle3.bloks.io/account/' + localStorage.currentAccount, '_blank').focus();
+      window.open('https://jungle3.bloks.io/account/' + getCurrentAccountName(), '_blank').focus();
     }
   });
   $('#eosinabox_share_backup_debug').on('click', (e)=>{
@@ -427,7 +453,7 @@ $(() => {
       accountName:          $('#eosinabox_accountName').val(),
       pubkey:               $('#eosinabox_pubkey').html(),
     };
-    localStorage.currentAccount = $('#eosinabox_accountName').val().toLowerCase();
+    localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
     localStorage.currentChain   = gState.chain;
     navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
@@ -436,12 +462,12 @@ $(() => {
   $('#eosinabox_transfer_from').on('click', () => {
     $('#eosinabox_transfer_from').html('...');
     setTimeout(()=>{
-      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+      $('#eosinabox_transfer_from').html(getCurrentAccountName());
     }, 500);
   });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
-    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+    $('#eosinabox_transfer_from').html(getCurrentAccountName());
     $('.navbar-collapse').collapse('hide');
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
@@ -511,12 +537,12 @@ $(() => {
       // default - unknown...
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
-      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+      $('#eosinabox_transfer_from').html(getCurrentAccountName());
     }
   }else{
     // plain onLoad, go to home page
     $('.eosinabox_page').hide();
     $(`.eosinabox_page_myAccount`).show();
-    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+    $('#eosinabox_transfer_from').html(getCurrentAccountName());
   }
 });
