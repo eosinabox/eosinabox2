@@ -167,7 +167,7 @@ $(() => {
     const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
     // console.log('bal::', balance);
     consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
-    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i>` );
+    $('#eosinabox_balance').html( `${balance} <i class="bi bi-arrow-repeat h6"></i><i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
   };
   $('#eosinbox_createKeys').on('click', async (event) => {
     event.preventDefault();
