@@ -9,6 +9,12 @@ const gChain = {
   jungle3: 'https://jungle3.cryptolions.io',
   eos    : 'https://api.eos.cryptolions.io',
 }
+const addAccountToLocalStorage = (accountWithChainPrefix) => {
+  const accoultListString = localStorage.allAccounts;
+  let accountList = []; if(!!accoultListString){ accountList = JSON.parse(accoultListString); }
+  accountList.push(accountWithChainPrefix);
+  localStorage.allAccounts = JSON.stringify( accountList );
+}
 const getCurrentAccountName = () => {
   const part = localStorage.currentAccount.split(':');
   // empty? new client phone, no account yet
@@ -176,7 +182,7 @@ $(() => {
     consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
     $('#eosinabox_balance').html( `${balance} <i class="eosinabox_refresh bi bi-arrow-repeat h6"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
   };
-  $('#eosinbox_createKeys').on('click', async (event) => {
+  $('#eosinbox_createKeys, .eosinbox_createKeysClass').on('click', async (event) => {
     event.preventDefault();
     // AMIHDEBUG TODO: generate random string on server and manage it in a session,
     // Perhaps this is not needed, not worried about replay attacks, discuss...
@@ -228,14 +234,14 @@ $(() => {
       // save in localStorage
       let credentialIdHex = eosjs_serialize.arrayToHex(new Uint8Array(credential.rawId));
       console.log('pubkeyAsHex: ', credentialIdHex);
-      if( !localStorage['eosinabox_pubkeys_jungle3'] ){
-        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
+      if( !localStorage['eosinabox_pubkeys'] ){
+        localStorage['eosinabox_pubkeys'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }else{
-        let o = JSON.parse(localStorage['eosinabox_pubkeys_jungle3']);
+        let o = JSON.parse(localStorage['eosinabox_pubkeys']);
         o.push({ credentialId: credentialIdHex, key: data.pubkey });
-        localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( o );
+        localStorage['eosinabox_pubkeys'] = JSON.stringify( o );
         // save just the new key, destroy the older ones!
-        // localStorage['eosinabox_pubkeys_jungle3'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
+        // localStorage['eosinabox_pubkeys'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }
       checkIfAllConditionsMet();
       await consoleLog( data );
@@ -257,7 +263,7 @@ $(() => {
     event.preventDefault();
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
     signatureProvider.keys.clear();
-    const keys = JSON.parse( localStorage.eosinabox_pubkeys_jungle3 );
+    const keys = JSON.parse( localStorage.eosinabox_pubkeys );
     for (const key of keys){
       signatureProvider.keys.set(key.key, key.credentialId);
     }
@@ -360,7 +366,7 @@ $(() => {
     event.preventDefault();
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
     signatureProvider.keys.clear();
-    const keys = JSON.parse( localStorage.eosinabox_pubkeys_jungle3 );
+    const keys = JSON.parse( localStorage.eosinabox_pubkeys );
     consoleLog({ fromMsg:'eosinabox_transfer_transact [0]', keys });
     for (const key of keys){
       consoleLog({ fromMsg:'eosinabox_transfer_transact [1]', key });
@@ -397,6 +403,52 @@ $(() => {
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       alert('Transaction failed with error, ' + error.message);
+    }
+  });
+  ///////////////////////////////////////////////////////////////////////////////////
+  // change active keys!
+  $('.eosinabox_buttonRestoreAccountTransaction').on('click', async (event) => {
+    event.preventDefault();
+    const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
+    signatureProvider.keys.clear();
+    const keys = JSON.parse( localStorage.eosinabox_pubkeys );
+    for (const key of keys){ signatureProvider.keys.set(key.key, key.credentialId); }
+    const rpc = new eosjs_jsonrpc.JsonRpc(gChain[getCurrentAccountChain()]);
+    const api = new eosjs_api.Api({ rpc, signatureProvider });
+    // cleos -u https://jungle3.cryptolions.io set account permission webauthn1111 active PUB_WA_77Nes48N65f1 -p webauthn1111@owner
+    const replaceKeysAccountName = $('.eosinabox_accountNameClassRestoreAccountTransaction').html();
+    const replaceKeysPubKey = $('.eosinabox_pubkeyClassRestoreAccountTransaction').html();
+    // const replaceKeysCustodian = $('.eosinabox_custodianAccountNameRestoreAccountTransaction').val();
+    try {
+      const result = await api.transact({
+        actions: [{
+          "account": "eosio",
+          "name": "updateauth",
+          "authorization": [{ "actor": replaceKeysAccountName, "permission": "owner" } ],
+          "data": {
+            "account": replaceKeysAccountName,
+            "permission": "active",
+            "parent": "owner",
+            "auth": {
+              "threshold": 1,
+              "keys": [{ "key": replaceKeysPubKey, "weight": 1 }
+              ],
+              "accounts": [],
+              "waits": []
+            }
+          }
+        }],
+      }, {
+        blocksBehind: 3,
+        expireSeconds: 60,
+      });
+      consoleLog( {logMsg: 'replaceKeys!', result } );
+      $('.eosinabox_accountNameClassRestoreAccountTransaction').html('');
+      $('.eosinabox_pubkeyClassRestoreAccountTransaction'     ).html('');
+      alert('Transaction sent - key change');
+    } catch (error) {
+      consoleLog( {logMsg: 'transaction - key change error!', error } );
+      alert('Transaction - key change failed with error, ' + error.message);
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////
@@ -445,7 +497,7 @@ $(() => {
 
   $('.eosinabox_share_inviteFriend').on('click', (e)=>{
     gState.shareEssentials = {
-      custodianAccountName: $('.eosinabox_custodianAccountNameInvite').val(),
+      custodianAccountName: $('.eosinabox_custodianAccountNameInvite').val().toLowerCase(),
     };
     const shareInfo = {
       url: `https://eosinabox.amiheines.com/#sharedInfo?action=` +
@@ -455,6 +507,19 @@ $(() => {
     navigator.share(shareInfo);
   });
 
+  $('.eosinabox_shareRestore').on('click', (e)=>{
+    gState.shareEssentials = {
+      accountName:          $('.eosinabox_accountNameClass').val(),
+      pubkey:               $('.eosinabox_pubkeyClass').html(),
+    };
+    localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
+    addAccountToLocalStorage(localStorage.currentAccount);
+    localStorage.currentChain   = gState.chain;
+    navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
+      `&pubkey=${gState.shareEssentials.pubkey}`
+    });
+  });
+
   $('#eosinabox_share').on('click', (e)=>{
     gState.shareEssentials = {
       custodianAccountName: $('#eosinabox_custodianAccountName').val(),
@@ -462,6 +527,7 @@ $(() => {
       pubkey:               $('#eosinabox_pubkey').html(),
     };
     localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
+    addAccountToLocalStorage(localStorage.currentAccount);
     localStorage.currentChain   = gState.chain;
     navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
@@ -515,6 +581,12 @@ $(() => {
     const params = window.location.href.split('#')[1].split('?')[1].split('&');
     var o = {};
     localStorage.sharedInfo = '';
+    $('.eosinabox_sharedinfo_action').html('');
+    $('.eosinabox_sharedinfo_chain').html('');
+    $('.eosinabox_sharedinfo_accountName').html('');
+    $('.eosinabox_sharedinfo_custodianAccountName').html('');
+    $('.eosinabox_sharedinfo_pubkey').html('');
+    $('.eosinabox_sharedinfo_cleos').html('');
     for(var i=0; i<params.length; i++){
       var param = params[i].split('=');
       o[param[0]] = param[1];
@@ -542,6 +614,17 @@ $(() => {
       $('#eosinabox_custodianAccountName').val(o.custodianAccountName);
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_createAccount`).show();
+    }else if(o.action == 'restoreAccount'){
+      gState.chain = o.chain;
+      console.log('[onLoad][restoreAccount][1] o:', o);
+      $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
+      $('.eosinabox_dropdown_blockchain button').html(o.chain);
+      $('.eosinabox_accountNameClassRestoreAccountTransaction').val(o.accountName);
+      $('.eosinabox_pubkeyClassRestoreAccountTransaction').val(o.pubkey);
+      // .eosinabox_custodianAccountNameRestoreAccountTransaction
+      // .eosinabox_buttonRestoreAccountTransaction
+      $('.eosinabox_page').hide();
+      $(`.eosinabox_page_restoreAccountTransaction`).show();
     }else{
       // default - unknown...
       $('.eosinabox_page').hide();

@@ -176,7 +176,7 @@
       </div>
       <div class="row">
         <div class="col">
-          <input class="eosinabox_custodianAccountNameInvite" type="text" class="form-control mb-4" placeholder="custodian account name">
+          <input type="text" class="form-control mb-4 eosinabox_custodianAccountNameInvite eosinabox_lowercase" placeholder="custodian account name">
         </div>
       </div>
       <div class="row">
@@ -218,7 +218,7 @@
       </div>
       <div class="row">
         <div class="col">
-          <input type="text" class="eosinabox_accountNameClass form-control mb-4" placeholder="account name">
+          <input type="text" class="eosinabox_accountNameClass form-control mb-4 eosinabox_lowercase" placeholder="account name">
           <div class="eosinabox_countAccountLenClass"></div>
         </div>
       </div>
@@ -235,6 +235,58 @@
         </div>
       </div>
     </div>
+
+    <div class="container-fluid eosinabox_page eosinabox_page_restoreAccountTransaction">
+      <div class="row">
+        <div class="col">
+          <h3>Alpha version!</h3>
+          <h3>Change Account Keys!</h3>
+          <p>
+            To restore access to your friend's account, you have to:
+          </p>
+          <ol>
+            <li>Enter the custodian account name (yours)</li>
+            <li>Send this transaction which will change the active key for your friend</li>
+          </ol>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="dropdown eosinabox_dropdown_blockchain">
+            <button class="btn btn-outline-primary dropdown-toggle .btn-block" type="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Choose A Chain: ...
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" data-chain="Jungle3" href="#">Jungle3 Test Net</a>
+              <a class="dropdown-item" data-chain="EOS"     href="#">EOS</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="eosinabox_accountNameClassRestoreAccountTransaction"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="text-break eosinabox_pubkeyClassRestoreAccountTransaction"></div>
+        </div>
+      </div>
+      <!-- <div class="row">
+        <div class="col">
+          <input type="text" class="form-control mb-4 eosinabox_custodianAccountNameRestoreAccountTransaction eosinabox_lowercase" placeholder="custodian account name">
+        </div>
+      </div> -->
+      <div class="row">
+        <div class="col">
+          <!-- <div class="text-break eosinabox_RestoreAccountTransaction"></div> -->
+          <button class="btn btn-primary btn-sm eosinabox_buttonRestoreAccountTransaction" type="submit">Replace keys for friend</button>
+        </div>
+      </div>
+    </div>
+
     <div class="container-fluid eosinabox_page eosinabox_page_help">
       <div class="row">
         <div class="col">
@@ -318,7 +370,7 @@
               phone's hardware security module to generate and manage keys for you. This backup only has the public keys.
               This is also why you need to use the custodian account to replace keys if you switch phones.
             </p>
-            <button id="eosinabox_share_backup_debug" class="btn btn-primary btn-sm" type="submit">Share My Account Public Info</button>
+            <button id="eosinabox_share_backup_debug" class="btn btn-primary btn-sm" type="submit">Backup My Account Info</button>
             <h3>Telegram group, chat, complain...</h3>
             <a href="https://t.me/EOSinaBox" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">EOS in a Box on Telegram</a>
           </div>
