@@ -494,6 +494,7 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `);
   });
   // onLoad
+  if(!localStorage.currentChain){ localStorage.currentChain = 'jungle3'; }
   gState.chain = localStorage.currentChain;
   try { updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
   if(typeof(PublicKeyCredential)=='undefined'){ // won't work if browser is not modern
