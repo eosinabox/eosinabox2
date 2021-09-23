@@ -415,7 +415,7 @@ $(() => {
       `inviteToCreateAccount&chain=${gState.chain}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
     }
-    navigator.share();
+    navigator.share(shareInfo);
   });
 
   $('#eosinabox_share').on('click', (e)=>{
