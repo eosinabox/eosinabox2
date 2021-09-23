@@ -149,7 +149,7 @@ $(() => {
     catch(err){
       if(!!err.details && !!err.details[0].message && err.details[0].message.substr(0,11) == 'unknown key'){
         console.log('Account not found - great news!!');
-        res.status(200).send({ available: true });
+        callback({ accountAvailable: true });
       }else{
         console.log('AMIHDEBUG error, account not found??', err);
         callback({ accountAvailable: false });
