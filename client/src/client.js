@@ -428,6 +428,7 @@ $(() => {
       pubkey:               $('#eosinabox_pubkey').html(),
     };
     localStorage.currentAccount = $('#eosinabox_accountName').val().toLowerCase();
+    localStorage.currentChain   = gState.chain;
     navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
@@ -450,10 +451,16 @@ $(() => {
   $('.eosinabox_dropdown_blockchain a.dropdown-item').on('click', (e)=>{
     console.log('data-chain:', $(e.target).data('chain'));
     console.log('text: ', $(e.target).text());
-    gState.chain = $(e.target).data('chain').toLowerCase();
-    $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `); // <i class="bi bi-check-circle-fill"></i>
+    // gState.chain = $(e.target).data('chain').toLowerCase(); // bug! returns the wrong info!
+    if( $(e.target).text()=='EOS' ){
+      gState.chain = 'eos';
+    }else{
+      gState.chain = 'jungle3';
+    }
+    $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `);
   });
   // onLoad
+  gState.chain = localStorage.currentChain;
   try { updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }
   if(typeof(PublicKeyCredential)=='undefined'){ // won't work if browser is not modern
     const os = detectOs();
