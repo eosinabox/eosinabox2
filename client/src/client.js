@@ -9,18 +9,29 @@ const gChain = {
   jungle3: 'https://jungle3.cryptolions.io',
   eos    : 'https://api.eos.cryptolions.io',
 }
+const repopulateMyAccounts = () => {
+  const accoultListString = localStorage.allAccounts;
+  let accountList = []; if(!!accoultListString){ accountList = JSON.parse(accoultListString); }
+  let s = '';
+  for(let i=0; i<accountList.length; i++){
+    s += `<a class="dropdown-item fromMyAccountsItem" href="#">${accountList[i]}</a>`;
+  }
+  $('.eosinabox_transfer_fromMyAccounts .dropdown-menu .dropdown-item').remove();
+  $('.eosinabox_transfer_fromMyAccounts .dropdown-menu').append(s);
+}
 const addAccountToLocalStorage = (accountWithChainPrefix) => {
   const accoultListString = localStorage.allAccounts;
   let accountList = []; if(!!accoultListString){ accountList = JSON.parse(accoultListString); }
   accountList.push(accountWithChainPrefix);
   localStorage.allAccounts = JSON.stringify( accountList );
+  repopulateMyAccounts();
 }
 const getCurrentAccountName = () => {
-  const part = localStorage.currentAccount.split(':');
+  const part = localStorage.currentAccount?.split(':');
   // empty? new client phone, no account yet
   // just one element? old format, no chain prefix
   // 2 parts? eosChain:accountname
-  if(part.length==0){
+  if(!part || part.length==0){
     return 'no account yet...'
   }else if(part.length==1){
     return part[0];
@@ -29,11 +40,11 @@ const getCurrentAccountName = () => {
   }
 }
 const getCurrentAccountChain = () => {
-  const part = localStorage.currentAccount.split(':');
+  const part = localStorage.currentAccount?.split(':');
   // empty? new client phone, no account yet
   // just one element? old format, no chain prefix, so must be jungle3
   // 2 parts? eosChain:accountname
-  if(part.length==0){
+  if(!part || part.length==0){
     return 'no account yet...'
   }else if(part.length==1){
     return 'jungle3';
@@ -163,11 +174,12 @@ $(() => {
     }
   }
   const getCurrencyBalance = async (chain, code, account, symbol) => {
-    if(account==null){ return [ 'No account...' ]; }
+    if(account=='no account yet...' || account==null){ return [ 'No account...' ]; }
     const response = await fetch(`/getCurrencyBalance/${chain}/${code}/${account}/${symbol}`);
     return response.json();
   }
   const getAccountInfo = async (chain, account) => {
+    if(account=='no account yet...' || account==null){ return {}; }
     const response = await fetch(`/getAccountInfo/${chain}/${account}`);
     return response.json();
   }
@@ -493,6 +505,12 @@ $(() => {
       window.open('https://jungle3.bloks.io/account/' + getCurrentAccountName(), '_blank').focus();
     }
   });
+
+  $('.eosinabox_transfer_fromMyAccounts').on('click', '.fromMyAccountsItem', (e) => {
+    console.log('[update current FROM account]', e);
+    // localStorage.currentAccount = e
+  });
+
   $('#eosinabox_share_backup_debug').on('click', (e)=>{
     navigator.share({ text: JSON.stringify(localStorage) });
   });
@@ -562,6 +580,7 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `);
   });
   // onLoad
+  repopulateMyAccounts();
   if(!localStorage.currentChain){ localStorage.currentChain = 'jungle3'; }
   gState.chain = localStorage.currentChain;
   try { updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:398', error }); }

@@ -22,7 +22,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <!-- MDB core JavaScript -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
-    <script src="client/src/client.js?123"></script>
+    <script src="client/src/client.js?12"></script>
     <script src="client/src/cbor.js" type="text/javascript"></script>
     <!-- https://github.com/EOSIO/eosjs/blob/master/docs/basic-usage/00_browser.md -->
     <script src='client/src/eosjs/dist-web/externals.min.js'></script>
@@ -82,6 +82,18 @@
           </p>
           <div id="eosinabox_balance" class="container-fluid h1 text-success"></div>
           <div id="eosinabox_transfer_from" class="mb-4 eosinabox_lowercase"></div>
+
+          <div class="eosinabox_transfer_fromMyAccounts dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Select Account
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </div>
+
           <input  id="eosinabox_transfer_to"       type="text" class="form-control mb-4 eosinabox_lowercase" placeholder="to">
           <input  id="eosinabox_transfer_quantity" type="text" class="form-control mb-4 eosinabox_uppercase" placeholder="0.0000 EOS">
           <input  id="eosinabox_transfer_memo"     type="text" class="form-control mb-4" placeholder="memo">
