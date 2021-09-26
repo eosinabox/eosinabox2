@@ -600,6 +600,9 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `);
   });
   // onLoad
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./pwaServiceWorker.js');
+  }
   repopulateMyAccounts();
   if(!localStorage.currentChain){ localStorage.currentChain = 'jungle3'; }
   gState.chain = localStorage.currentChain;
