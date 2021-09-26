@@ -188,11 +188,19 @@ $(() => {
       chain = gState.chain;
     }
     if(!chain){ chain = 'jungle3'; } // still no chain?? fall back to jungle3
-    const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
+    // const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
     const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
     // console.log('bal::', balance);
-    consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
-    $('#eosinabox_balance').html( `${balance} <i class="eosinabox_refresh bi bi-arrow-repeat h6"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
+    // consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
+    consoleLog({ logMsg: 'getAccountInfo[2az]',
+      liqBal    : accountInfo.core_liquid_balance,
+      netLimitAv: accountInfo.net_limit.available,
+      cpuLimitAv: accountInfo.cpu_limit.available,
+    });
+    // $('#eosinabox_balance').html( `${balance} <i class="eosinabox_refresh bi bi-arrow-repeat h6"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
+    $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h6"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
+    $('#eosinabox_power1').html( `NET available: ${accountInfo.net_limit.available}` );
+    $('#eosinabox_power2').html( `CPU available: ${accountInfo.cpu_limit.available}` );
   };
   $('#eosinbox_createKeys, .eosinbox_createKeysClass').on('click', async (event) => {
     event.preventDefault();
