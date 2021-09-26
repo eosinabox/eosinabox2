@@ -138,7 +138,8 @@ $(() => {
   });
   const checkIfAllConditionsMet = () => {
     // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
-    if(gState.accountName && gState.custodianAccountName && gState.pubkey){
+    if(gState.accountName && gState.pubkey
+      && (gState.custodianAccountName || $('#eosinabox_custodianAccountName').val().length>2)){
       $('#eosinbox_createKeys' ).hide();
       $('#eosinabox_share').show();
     }else{
@@ -424,7 +425,11 @@ $(() => {
       alert('Transaction sent');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
-      alert('Transaction failed with error, ' + error.message);
+      if(error.message.includes('too high')){
+        alert('You need to power up the account first, check the help page, ' + error.message);
+      }else{
+        alert('Transaction failed with error, ' + error.message);
+      }
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////
@@ -515,8 +520,10 @@ $(() => {
   });
 
   $('.eosinabox_transfer_fromMyAccounts').on('click', '.fromMyAccountsItem', (e) => {
-    console.log('[update current FROM account]', e);
-    // localStorage.currentAccount = e
+    console.log('[update current FROM account]', $(e.target).html());
+    localStorage.currentAccount = $(e.target).html();
+    $('#eosinabox_transfer_from').html( $(e.target).html() );
+    updateBalance();
   });
 
   $('#eosinabox_share_backup_debug').on('click', (e)=>{
