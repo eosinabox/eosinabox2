@@ -37,6 +37,9 @@ const chain = {
 app.get("/", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src', 'index.html') );
 });
+app.get("/:filename", (req, res) => {
+  res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
+});
 app.get("/client/src/:filename", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
 });
