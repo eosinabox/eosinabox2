@@ -43,6 +43,9 @@ app.get("/:filename", (req, res) => {
 app.get("/client/src/:filename", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
 });
+app.get("/icons/:filename", (req, res) => {
+  res.sendFile( path.join(__dirname, 'client/src/icons', req.params.filename) );
+});
 app.get("/client/src/eosjs/dist-web/:filename", (req, res) => {
   res.sendFile( path.join(__dirname, 'client/src/eosjs/dist-web', req.params.filename) );
 });
