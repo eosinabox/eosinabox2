@@ -195,8 +195,8 @@ $(() => {
     // consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
     if(!!accountInfo.errMsg){
       $('#eosinabox_balance').html( `Account not found <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
-      $('#eosinabox_power1').html( `` );
-      $('#eosinabox_power2').html( `` );
+      $('#eosinabox_power1').html( `perhaps the custodian` );
+      $('#eosinabox_power2').html( `needs to create it for you` );
     }else{
       consoleLog({ logMsg: 'getAccountInfo[2az]',
         liqBal    : accountInfo.core_liquid_balance,
