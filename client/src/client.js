@@ -215,7 +215,7 @@ $(() => {
     const randomStringFromServer = 'replayAttackProtectionRandomStringNotNeeded?';
     const rp = {
       name: "Ami Heines",
-      id: "eosinabox.amiheines.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com (move out to a config .json file?)
+      id: "eosinabox.com", // AMIHDEBUG TODO: update this when installing on another web site, e.g. eosinabox.com (move out to a config .json file?)
     };
     const accName = $('#eosinabox_accountName').val();
     const publicKeyCredentialCreationOptions = {
@@ -298,7 +298,7 @@ $(() => {
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     console.log('[eosinbox_approveThisTransaction] [sharedInfo]' + localStorage.sharedInfo);
     let o = JSON.parse(localStorage.sharedInfo);
-    // https://eosinabox.amiheines.com/#sharedInfo?
+    // https://eosinabox.com/#sharedInfo?
     // action=createAccount&
     // chain=jungle3&
     // accountName=cggdggffgyft&
@@ -540,7 +540,7 @@ $(() => {
       custodianAccountName: $('.eosinabox_custodianAccountNameInvite').val().toLowerCase(),
     };
     const shareInfo = {
-      url: `https://eosinabox.amiheines.com/#sharedInfo?action=` +
+      url: `https://eosinabox.com/#sharedInfo?action=` +
       `inviteToCreateAccount&chain=${gState.chain}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
     }
@@ -555,7 +555,7 @@ $(() => {
     localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
     addAccountToLocalStorage(localStorage.currentAccount);
     localStorage.currentChain   = gState.chain;
-    navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
+    navigator.share({ url: `https://eosinabox.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
       `&pubkey=${gState.shareEssentials.pubkey}`
     });
   });
@@ -569,7 +569,7 @@ $(() => {
     localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
     addAccountToLocalStorage(localStorage.currentAccount);
     localStorage.currentChain   = gState.chain;
-    navigator.share({ url: `https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
+    navigator.share({ url: `https://eosinabox.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
     });
   });
@@ -639,8 +639,8 @@ $(() => {
     localStorage.sharedInfo = JSON.stringify(o);
     history.pushState('', '', window.location.pathname); // delete the share info, so it won't go back again to that page.
     // full share of create account OR partial share of invite friend?
-    // https://eosinabox.amiheines.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=aminewphone1&custodianAccountName=webauthntest&pubkey=PUB_WA_9vAuvYoJ3iWMKp9hEwfRaz645GQZ89F4w1e6XA4DCQGTh4aQwtQVNQ9MGVYbGa48suGGAuDZPpuFmjHEKvzp
-    // https://eosinabox.amiheines.com/#sharedInfo?action=inviteToCreateAccount&chain=jungle3&custodianAccountName=undefined
+    // https://eosinabox.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=aminewphone1&custodianAccountName=webauthntest&pubkey=PUB_WA_9vAuvYoJ3iWMKp9hEwfRaz645GQZ89F4w1e6XA4DCQGTh4aQwtQVNQ9MGVYbGa48suGGAuDZPpuFmjHEKvzp
+    // https://eosinabox.com/#sharedInfo?action=inviteToCreateAccount&chain=jungle3&custodianAccountName=undefined
     if(o.action == 'createAccount'){
       const cleosCommand = [
         `cleos -u ${gChain[gState.chain]} system newaccount`,
