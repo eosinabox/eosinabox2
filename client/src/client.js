@@ -284,7 +284,7 @@ $(() => {
     localStorage.sharedInfo = '';
     $('.eosinabox_page').hide();
     $(`.eosinabox_page_myAccount`).show();
-    $('#eosinabox_transfer_from').html(getCurrentAccountName());
+    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
   });
   $('#eosinbox_approveThisTransaction').on('click', async (event) => {
     event.preventDefault();
@@ -383,7 +383,7 @@ $(() => {
       localStorage.sharedInfo = '';
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
-      $('#eosinabox_transfer_from').html(getCurrentAccountName());
+      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       alert('Transaction failed with error, ' + error.message);
@@ -576,12 +576,12 @@ $(() => {
   $('#eosinabox_transfer_from').on('click', () => {
     $('#eosinabox_transfer_from').html('...');
     setTimeout(()=>{
-      $('#eosinabox_transfer_from').html(getCurrentAccountName());
+      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     }, 500);
   });
   $('nav li a.nav-link').on('click', (e) => {
     e.preventDefault();
-    $('#eosinabox_transfer_from').html(getCurrentAccountName());
+    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     $('.navbar-collapse').collapse('hide');
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
@@ -670,12 +670,12 @@ $(() => {
       // default - unknown...
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
-      $('#eosinabox_transfer_from').html(getCurrentAccountName());
+      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     }
   }else{
     // plain onLoad, go to home page
     $('.eosinabox_page').hide();
     $(`.eosinabox_page_myAccount`).show();
-    $('#eosinabox_transfer_from').html(getCurrentAccountName());
+    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
   }
 });
