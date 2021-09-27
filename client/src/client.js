@@ -379,17 +379,25 @@ $(() => {
         expireSeconds: 60,
       });
       consoleLog( {logMsg: 'createdAccount!', result } );
-      alert('Transaction sent, let the other person know you created their account');
+      alert('Transaction sent, let the other person know you created their account and send them some EOS!');
       localStorage.sharedInfo = '';
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
       $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+      $('#eosinabox_transfer_to').html(o.accountName);
+      $('#eosinabox_transfer_memo').html('Initial EOS transfer using EOS-in-a-Box 🌈');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       alert('Transaction failed with error, ' + error.message);
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////
+  $('#eosinabox_transfer_quantity').on('input', () => {
+    const ele = $('#eosinabox_transfer_quantity');
+    var start = ele[0].selectionStart, end = ele[0].selectionEnd; // store current positions in variables
+    ele.val( parseFloat( ele.val() ).toFixed(4) + ' EOS' );
+    ele[0].setSelectionRange(start, end); // restore from variables...
+  });
   $('#eosinabox_transfer_transact').on('click', async (event) => {
     event.preventDefault();
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
@@ -407,7 +415,8 @@ $(() => {
     consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
     console.log('[eosinbox_signTransaction] [click] [5]');
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
-    const quantity = $('#eosinabox_transfer_quantity').val().toUpperCase();
+    // const quantity = parseFloat( $('#eosinabox_transfer_quantity').val().toUpperCase() ).toFixed(4) + ' EOS';
+    const quantity = $('#eosinabox_transfer_quantity').val();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
     console.log('from, to, quant, memo:', localStorage.currentAccount, to, quantity, memo);
     try {
@@ -634,6 +643,7 @@ $(() => {
     for(var i=0; i<params.length; i++){
       var param = params[i].split('=');
       o[param[0]] = param[1];
+      if( param[0]=='chain' ){ gState.chain = o.chain; }
       $(`.eosinabox_sharedinfo_${param[0]}`).html(param[1]);
     }
     localStorage.sharedInfo = JSON.stringify(o);
@@ -642,7 +652,6 @@ $(() => {
     // https://eosinabox.com/#sharedInfo?action=createAccount&chain=jungle3&accountName=aminewphone1&custodianAccountName=webauthntest&pubkey=PUB_WA_9vAuvYoJ3iWMKp9hEwfRaz645GQZ89F4w1e6XA4DCQGTh4aQwtQVNQ9MGVYbGa48suGGAuDZPpuFmjHEKvzp
     // https://eosinabox.com/#sharedInfo?action=inviteToCreateAccount&chain=jungle3&custodianAccountName=undefined
     if(o.action == 'createAccount'){
-      gState.chain = o.chain;
       const cleosCommand = [
         `cleos -u ${gChain[gState.chain]} system newaccount`,
         `_CREATOR_ACCOUNT_ ${o.accountName} ${o.custodianAccountName}@active ${o.pubkey}`,
@@ -652,7 +661,6 @@ $(() => {
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_sharedInfo`).show();
     }else if(o.action == 'inviteToCreateAccount'){
-      gState.chain = o.chain;
       console.log('[onLoad][invite][1] o:', o);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
@@ -660,7 +668,6 @@ $(() => {
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_createAccount`).show();
     }else if(o.action == 'restoreAccount'){
-      gState.chain = o.chain;
       console.log('[onLoad][restoreAccount][1] o:', o);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
