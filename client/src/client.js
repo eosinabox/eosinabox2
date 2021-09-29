@@ -59,6 +59,17 @@ const consoleLog = async (logObj) => {
     body: JSON.stringify(logObj)
   });
 }
+const callMyShare = (txtToShare) => {
+  if(navigator.share){
+    navigator.share({ text: txtToShare }); // url: ?
+  }else{
+    navigator.clipboard.writeText(txtToShare).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  }
+}
 const detectOs = () => {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
   // Windows Phone must come first because its UA also contains "Android"
@@ -395,6 +406,7 @@ $(() => {
   $('#eosinabox_transfer_quantity').on('input', () => {
     const ele = $('#eosinabox_transfer_quantity');
     var start = ele[0].selectionStart, end = ele[0].selectionEnd; // store current positions in variables
+    if( ele.val()=='.' && start==1 && end==1 ){ ele.val('0.'); start = end = 2; }
     ele.val( parseFloat( ele.val() ).toFixed(4) + ' EOS' );
     ele[0].setSelectionRange(start, end); // restore from variables...
   });
@@ -415,7 +427,6 @@ $(() => {
     consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
     console.log('[eosinbox_signTransaction] [click] [5]');
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
-    // const quantity = parseFloat( $('#eosinabox_transfer_quantity').val().toUpperCase() ).toFixed(4) + ' EOS';
     const quantity = $('#eosinabox_transfer_quantity').val();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
     console.log('from, to, quant, memo:', localStorage.currentAccount, to, quantity, memo);
@@ -541,7 +552,7 @@ $(() => {
   });
 
   $('#eosinabox_share_backup_debug').on('click', (e)=>{
-    navigator.share({ text: JSON.stringify(localStorage) });
+    callMyShare(JSON.stringify(localStorage)); // txt? or url
   });
 
   $('.eosinabox_share_inviteFriend').on('click', (e)=>{
@@ -550,10 +561,11 @@ $(() => {
     };
     const shareInfo = {
       url: `https://eosinabox.com/#sharedInfo?action=` +
-      `inviteToCreateAccount&chain=${gState.chain}` +
-      `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
+        `inviteToCreateAccount&chain=${gState.chain}` +
+        `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
     }
-    navigator.share(shareInfo);
+    // navigator.share(shareInfo);
+    callMyShare( shareInfo.url );
   });
 
   $('.eosinabox_shareRestore').on('click', (e)=>{
@@ -564,9 +576,13 @@ $(() => {
     localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
     addAccountToLocalStorage(localStorage.currentAccount);
     localStorage.currentChain   = gState.chain;
-    navigator.share({ url: `https://eosinabox.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
+    // navigator.share({ url: `https://eosinabox.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
+    //   `&pubkey=${gState.shareEssentials.pubkey}`
+    // });
+    callMyShare(`https://eosinabox.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&` +
+      `accountName=${gState.shareEssentials.accountName}` +
       `&pubkey=${gState.shareEssentials.pubkey}`
-    });
+    );
   });
 
   $('#eosinabox_share').on('click', (e)=>{
@@ -577,10 +593,12 @@ $(() => {
     };
     localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
     addAccountToLocalStorage(localStorage.currentAccount);
-    localStorage.currentChain   = gState.chain;
-    navigator.share({ url: `https://eosinabox.com/#sharedInfo?action=createAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
-      `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&pubkey=${gState.shareEssentials.pubkey}`
-    });
+    localStorage.currentChain = gState.chain;
+    const shareTxt = `https://eosinabox.com/#sharedInfo?action=createAccount&chain=${gState.chain}&` +
+      `accountName=${gState.shareEssentials.accountName}` +
+      `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&` +
+      `pubkey=${gState.shareEssentials.pubkey}`;
+    callMyShare(shareTxt);
   });
   $('#eosinabox_transfer_from').on('click', () => {
     $('#eosinabox_transfer_from').html('...');
