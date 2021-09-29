@@ -406,7 +406,16 @@ $(() => {
   $('#eosinabox_transfer_quantity').on('input', () => {
     const ele = $('#eosinabox_transfer_quantity');
     var start = ele[0].selectionStart, end = ele[0].selectionEnd; // store current positions in variables
-    if( ele.val()=='.' && start==1 && end==1 ){ ele.val('0.'); start = end = 2; }
+    if( parseFloat( ele.val() )==0 ){
+      ele.val('');
+      start = end = 1;
+      ele[0].setSelectionRange(start, end);
+      return;
+    }
+    if( ele.val()=='.' && start<=1 && end<=1 ){
+      ele.val('0.');
+      start = end = 2;
+    }
     ele.val( parseFloat( ele.val() ).toFixed(4) + ' EOS' );
     ele[0].setSelectionRange(start, end); // restore from variables...
   });
