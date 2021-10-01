@@ -225,7 +225,7 @@ $(() => {
       const gaugeEstimatedNumOfTx = Math.min(accountInfo.net_limit.available, accountInfo.cpu_limit.available) / 250; // 0 .. 1 .. 10 .. 100 .. 1000
       const gaugeOrderOfMagnitude = Math.log10( 1 + gaugeEstimatedNumOfTx ); // 1 .. 2 .. 11 .. 101 .. 1001 => 0 .. 0.3 .. 1.04 .. 2.004 .. 3.0004
       const gaugeSigmoid = Math.tanh(gaugeOrderOfMagnitude); // 0 .. 0.3 .. 1.04 .. 2.004 .. 3.0004 => 0 .. 0.29 .. 0.78 .. 0.96 .. 0.995
-      const gaugeMin = 5, gaugeMax = 175;
+      const gaugeMin = 10, gaugeMax = 170;
       const gaugeAngle = gaugeMin + (gaugeMax - gaugeMin) * gaugeSigmoid;
       $('#eosinabox_powerup_gauge svg #dial')[0].setAttribute('transform','rotate(' + gaugeAngle + ' 150 150 )');
     }
@@ -417,7 +417,7 @@ $(() => {
   $('#eosinabox_transfer_quantity').on('input', () => {
     const ele = $('#eosinabox_transfer_quantity');
     var start = ele[0].selectionStart, end = ele[0].selectionEnd; // store current positions in variables
-    if( parseFloat( ele.val() )==0 ){
+    if( parseFloat( ele.val() )==0 && start<=1 && end<=1 ){
       ele.val('');
       start = end = 1;
       ele[0].setSelectionRange(start, end);
@@ -554,7 +554,10 @@ $(() => {
   //     consoleLog(err);
   //   });
   // });
-  $('#eosinabox_balance').on('click', '#eosinabox_balance,.eosinabox_refresh', updateBalance);
+  $('#eosinabox_balance').on('click', '#eosinabox_balance,.eosinabox_refresh', (e) => {
+    e.preventDefault();
+    updateBalance(gState.chain);
+  });
   // $('.eosinabox_viewOnExplorer').on('click', (e)=>{
   $('#eosinabox_balance').on('click', '.eosinabox_viewOnExplorer', (e)=>{
       if(getCurrentAccountChain()=='eos'){
