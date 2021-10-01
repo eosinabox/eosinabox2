@@ -55,16 +55,12 @@
       }
       .eosinabox_lowercase { text-transform: lowercase; }
       .eosinabox_uppercase { text-transform: uppercase; }
-      #eosinabox_transfer_from {
-        border: 1px solid lightgray;
-        padding: 7px;
-        border-radius: 3px;
-      }
+      .eosinabox_page_tldr ol { padding-inline-start: 15px; }
     </style>
   </head>
   <body>
     <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">EOS in a Box</a>
+      <a class="navbar-brand" href="#">EOS in a Box (Alpha)</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -81,54 +77,52 @@
         </ul>
       </div>
     </nav>
-    <div class="container-fluid eosinabox_page eosinabox_page_myAccount">
-      <div class="row">
-        <div class="col">
-          <h3>Alpha version!</h3>
-          <h3>My Account page</h3>
-          <p>
-            Here you can see your available EOS balance.
-            Refresh the value by tapping on it.
-          </p>
-          <div id="eosinabox_balance" class="container-fluid h1 text-success"></div>
-          <div id="eosinabox_powerup_gauge" class="container-fluid">
-            <div class="row">
-              <div class="col-xs-4">
-                <!-- https://www.w3schools.com/graphics/tryit.asp?filename=trysvg_myfirst -->
-                <svg width="100" height="50" viewBox="0 0 300 180" >
-                  <defs>
-                    <linearGradient x1="0%" y1="50%" x2="100%" y2="50%" id="A"><stop offset="0%"  stop-color="#eb3a00"/><stop offset="10%" stop-color="#ffbf33"/><stop offset="30%" stop-color="#fff423"/><stop offset="45%" stop-color="#e3ff47"/><stop offset="99%" stop-color="#50ff08"/></linearGradient>
-                    <path id="dialPrototype" d="M-30 -10L140 -5L145 0L140 5L-30 10Z" fill="#233" stroke="none" transform="rotate(-180 0 0)"/>
-                  </defs>
-                  <path d="M10 150A80 80 0 0 1 290 150L270 150A60 60 0 0 0 30 150" fill="url(#A)" />
-                  <use id="dial" href="#dialPrototype" x="150" y="150"/>
-                  <circle cx="150" cy="150" r="15" stroke="darkblue" stroke-width="5" fill="#4d1919" />
-                </svg>
-              </div>
-              <div class="col-xs-8">
-                <div id="eosinabox_power1" class="container-fluid"></div>
-                <div id="eosinabox_power2" class="container-fluid"></div>
-              </div>
-            </div>
-          </div>
-
+    <div class="container eosinabox_page eosinabox_page_myAccount">
+      <div class="row pt-2 pl-3 my-auto">
+        <div class="col-xs-11 my-auto">
+          <div id="eosinabox_transfer_from" class="eosinabox_lowercase h4 text-primary my-auto"></div>
+        </div>
+        <div class="col-xs-1">
           <div class="eosinabox_transfer_fromMyAccounts dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Select From Account
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
               <a class="dropdown-item" href="#">Action</a>
               <a class="dropdown-item" href="#">Action2</a>
               <a class="dropdown-item" href="#">Action3</a>
             </div>
           </div>
-
-          <div id="eosinabox_transfer_from" class="mb-4 eosinabox_lowercase"></div>
-          <input  id="eosinabox_transfer_to"       type="text" class="form-control mb-4 eosinabox_lowercase" placeholder="to">
-          <input  id="eosinabox_transfer_quantity" type="text" class="form-control mb-4 eosinabox_uppercase" placeholder="0.0000 EOS">
-          <input  id="eosinabox_transfer_memo"     type="text" class="form-control mb-4" placeholder="memo">
-          <button id="eosinabox_transfer_transact" class="btn btn-primary btn-sm" type="submit">Send Transaction</button>
         </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div id="eosinabox_balance" class="h2 text-primary"></div>
+        </div>
+      </div>
+      <div class="row px-2">
+        <div class="col-xs-4">
+            <div id="eosinabox_powerup_gauge">
+            <!-- https://www.w3schools.com/graphics/tryit.asp?filename=trysvg_myfirst -->
+            <svg width="100" height="50" viewBox="0 0 300 180" >
+              <defs>
+                <linearGradient x1="0%" y1="50%" x2="100%" y2="50%" id="A"><stop offset="0%"  stop-color="#eb3a00"/><stop offset="10%" stop-color="#ffbf33"/><stop offset="30%" stop-color="#fff423"/><stop offset="45%" stop-color="#e3ff47"/><stop offset="99%" stop-color="#50ff08"/></linearGradient>
+                <path id="dialPrototype" d="M-30 -10L140 -5L145 0L140 5L-30 10Z" fill="#233" stroke="none" transform="rotate(-180 0 0)"/>
+              </defs>
+              <path d="M10 150A80 80 0 0 1 290 150L270 150A60 60 0 0 0 30 150" fill="url(#A)" />
+              <use id="dial" href="#dialPrototype" x="150" y="150"/>
+              <circle cx="150" cy="150" r="15" stroke="darkblue" stroke-width="5" fill="#4d1919" />
+            </svg>
+          </div>
+        </div>
+        <div class="col-xs-8">
+          <div class="container-fluid"><small id="eosinabox_power1"></small></div>
+          <div class="container-fluid"><small id="eosinabox_power2"></small></div>
+        </div>
+      </div>
+      <div class="row px-2 mt-3">
+        <input  id="eosinabox_transfer_to"       type="text" class="form-control mb-3 eosinabox_lowercase" placeholder="to">
+        <input  id="eosinabox_transfer_quantity" type="text" class="form-control mb-3 eosinabox_uppercase" placeholder="0.0000 EOS">
+        <input  id="eosinabox_transfer_memo"     type="text" class="form-control mb-2" placeholder="memo">
+        <button id="eosinabox_transfer_transact" class="btn btn-primary btn-sm" type="submit">Send Transaction</button>
       </div>
     </div>
     <div class="container-fluid eosinabox_page eosinabox_page_createAccount">
@@ -427,21 +421,20 @@
           <h2 class="eosinabox_help_header">Too Long; Didn't Read</h2>
           <div class="eosinabox_help">
             <ol>
-              <li>This is a simple front end web wallet for the EOS blockchain</li>
-              <li>It is a work in progress and will have additional features soon</li>
+              <li>A simple front end web wallet for the EOS blockchain</li>
               <li>Blockchain uses a system of key pairs</li>
               <li>Private keys should be kept private, you use them to send transactions from your account to the blockchain</li>
               <li>Public Keys are public, they are related to the private keys and allow the blockchain to verifie your transactions are valid</li>
               <li>EOS blockchain has a permission system with an everyday key, called "Active" and a master key called "Owner"</li>
-	      <li>EOS in a Box creates accounts on the EOS blockchain with an easy and secure "Avtive" key leveraging your phone's built-in hardware security module with Face-ID or fingerprints</li>
-	      <li>EOS in a Box requires a "Custodian" account in case your phone gets stolen or breaks</li>
-	      <li>Think of the "Active" key as the key to your house or car</li>
-	      <li>Think of the "Owner" key as a Locksmith, someone that can break into your house or car but is trustworthy</li>
-	      <li>You can be your own Custodian (future) by securly managing a key pair and creating an EOS in a Box account with the Public Key as the Custodian</li>
-	      <li>Don't put large amounts of tokens in this wallet if you don't understand the implications</li>
+              <li>EOS in a Box creates accounts on the EOS blockchain with an easy and secure "Active" key leveraging your phone's built-in hardware security module with Face-ID or fingerprints</li>
+              <li>EOS in a Box requires a "Custodian" account in case your phone gets stolen or breaks</li>
+              <li>Think of the "Active" key as the key to your house</li>
+              <li>Think of the "Owner" key as a Locksmith, someone that can break into your house but is trustworthy</li>
+              <li>You can be your own Custodian (future) by securly managing a key pair and creating an EOS in a Box account with the Public Key as the Custodian</li>
+              <li>Don't put large amounts of tokens in this wallet if you don't understand the implications</li>
             </ol>
-	    <a href="https://t.me/EOSinaBox" class="btn btn-primary btn-sm active" role="button" aria-pressed="true"><h5>EOS in a Box on Telegram</h5></a>
-	    <br>&nbsp;
+	          <a href="https://t.me/EOSinaBox" class="btn btn-primary btn-sm active" role="button" aria-pressed="true"><h5>EOS in a Box on Telegram</h5></a>
+	          <br>&nbsp;
           </div>
         </div>
       </div>

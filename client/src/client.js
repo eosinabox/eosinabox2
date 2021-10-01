@@ -14,7 +14,7 @@ const repopulateMyAccounts = () => {
   let accountList = []; if(!!accoultListString){ accountList = JSON.parse(accoultListString); }
   let s = '';
   for(let i=0; i<accountList.length; i++){
-    s += `<a class="dropdown-item fromMyAccountsItem" href="#">${accountList[i]}</a>`;
+    s += `<a class="dropdown-item text-primary fromMyAccountsItem" href="#">${accountList[i]}</a>`;
   }
   $('.eosinabox_transfer_fromMyAccounts .dropdown-menu .dropdown-item').remove();
   $('.eosinabox_transfer_fromMyAccounts .dropdown-menu').append(s);
@@ -215,9 +215,9 @@ $(() => {
         netLimitAv: accountInfo.net_limit.available,
         cpuLimitAv: accountInfo.cpu_limit.available,
       });
-      $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h3"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h3 text-primary"></i>` );
-      $('#eosinabox_power1').html( `NET available: ${accountInfo.net_limit.available}` );
-      $('#eosinabox_power2').html( `CPU available: ${accountInfo.cpu_limit.available}` );
+      $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h2"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h2 text-primary"></i>` );
+      $('#eosinabox_power1').html( `NET available: ${Number.parseFloat(accountInfo.net_limit.available/1024).toFixed(2)} KB` );
+      $('#eosinabox_power2').html( `CPU available: ${Number.parseFloat(accountInfo.cpu_limit.available/1000).toFixed(2)} ms` );
       // calc gauge settiings, each simple transaction takes about 250 usec CPU and 250 bytes NET, so take the minimum of these and divide by 250
       // then take the log base 10 of that
       // sigmoid function, then convert to degrees
@@ -646,6 +646,7 @@ $(() => {
     $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `);
   });
   // onLoad
+  /////////
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./pwaServiceWorker.js');
   }

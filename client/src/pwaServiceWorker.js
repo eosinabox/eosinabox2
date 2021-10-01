@@ -17,18 +17,17 @@ self.addEventListener('install', function(e) {
   );
 });
 
-/* Serve cached content when offline */
+/* Serve cached content but also get from server for next time */
 self.addEventListener('fetch', function(e) {
-  // console.log('[pwaServiceWorker] network or cache: ' + e.request.url);
   e.respondWith(
-    caches.match(e.request).then(function(response) {
-      return response || fetch(e.request).then(function (response) {
-        console.log('[pwaServiceWorker] Caching new resource: ' + e.request.url, '[response]', response);
+    caches.match(e.request).then(function(cachedResponse) {
+      fetch(e.request).then(function (response) {
         caches.open(cacheName).then(function(cache) {
           cache.put(e.request.url, response.clone());
           return response;
         });
       });
+      return cachedResponse;
     }).catch(function(err){ console.log(err); })
   );
 });
