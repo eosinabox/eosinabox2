@@ -19,9 +19,16 @@ self.addEventListener('install', function(e) {
 
 /* Serve cached content when offline */
 self.addEventListener('fetch', function(e) {
+  // console.log('[pwaServiceWorker] network or cache: ' + e.request.url);
   e.respondWith(
     caches.match(e.request).then(function(response) {
-      return response || fetch(e.request);
-    })
+      return response || fetch(e.request).then(function (response) {
+        console.log('[pwaServiceWorker] Caching new resource: ' + e.request.url, '[response]', response);
+        caches.open(cacheName).then(function(cache) {
+          cache.put(e.request.url, response.clone());
+          return response;
+        });
+      });
+    }).catch(function(err){ console.log(err); })
   );
 });

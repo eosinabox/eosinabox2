@@ -201,6 +201,7 @@ $(() => {
     }
     if(!chain){ chain = 'jungle3'; } // still no chain?? fall back to jungle3
     // const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
+    console.log("[await getAccountInfo]", getCurrentAccountChain(), getCurrentAccountName());
     const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
     // console.log('bal::', balance);
     // consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
@@ -214,9 +215,19 @@ $(() => {
         netLimitAv: accountInfo.net_limit.available,
         cpuLimitAv: accountInfo.cpu_limit.available,
       });
-      $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h6"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
+      $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h3"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h3 text-primary"></i>` );
       $('#eosinabox_power1').html( `NET available: ${accountInfo.net_limit.available}` );
       $('#eosinabox_power2').html( `CPU available: ${accountInfo.cpu_limit.available}` );
+      // calc gauge settiings, each simple transaction takes about 250 usec CPU and 250 bytes NET, so take the minimum of these and divide by 250
+      // then take the log base 10 of that
+      // sigmoid function, then convert to degrees
+      // 0-inf => 0-1 => 0-180
+      const gaugeEstimatedNumOfTx = Math.min(accountInfo.net_limit.available, accountInfo.cpu_limit.available) / 250; // 0 .. 1 .. 10 .. 100 .. 1000
+      const gaugeOrderOfMagnitude = Math.log10( 1 + gaugeEstimatedNumOfTx ); // 1 .. 2 .. 11 .. 101 .. 1001 => 0 .. 0.3 .. 1.04 .. 2.004 .. 3.0004
+      const gaugeSigmoid = Math.tanh(gaugeOrderOfMagnitude); // 0 .. 0.3 .. 1.04 .. 2.004 .. 3.0004 => 0 .. 0.29 .. 0.78 .. 0.96 .. 0.995
+      const gaugeMin = 5, gaugeMax = 175;
+      const gaugeAngle = gaugeMin + (gaugeMax - gaugeMin) * gaugeSigmoid;
+      $('#eosinabox_powerup_gauge svg #dial')[0].setAttribute('transform','rotate(' + gaugeAngle + ' 150 150 )');
     }
   };
   $('#eosinbox_createKeys, .eosinbox_createKeysClass').on('click', async (event) => {
@@ -554,7 +565,6 @@ $(() => {
   });
 
   $('.eosinabox_transfer_fromMyAccounts').on('click', '.fromMyAccountsItem', (e) => {
-    console.log('[update current FROM account]', $(e.target).html());
     localStorage.currentAccount = $(e.target).html();
     $('#eosinabox_transfer_from').html( $(e.target).html() );
     updateBalance();
