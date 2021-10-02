@@ -226,7 +226,7 @@ $(() => {
       const gaugeEstimatedNumOfTx = Math.min(accountInfo.net_limit.available, accountInfo.cpu_limit.available) / 250; // 0 .. 1 .. 10 .. 100 .. 1000
       const gaugeOrderOfMagnitude = Math.log10( 1 + gaugeEstimatedNumOfTx ); // 1 .. 2 .. 11 .. 101 .. 1001 => 0 .. 0.3 .. 1.04 .. 2.004 .. 3.0004
       const gaugeSigmoid = Math.tanh(gaugeOrderOfMagnitude); // 0 .. 0.3 .. 1.04 .. 2.004 .. 3.0004 => 0 .. 0.29 .. 0.78 .. 0.96 .. 0.995
-      const gaugeMin = 10, gaugeMax = 170;
+      const gaugeMin = 5, gaugeMax = 175;
       const gaugeAngle = gaugeMin + (gaugeMax - gaugeMin) * gaugeSigmoid;
       $('#eosinabox_powerup_gauge svg #dial')[0].setAttribute('transform','rotate(' + gaugeAngle + ' 150 150 )');
     }
