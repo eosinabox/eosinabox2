@@ -138,7 +138,7 @@
         </div>
       </div>
       <div class="row px-2 mt-3">
-        <input  id="eosinabox_transfer_to"       type="text" class="form-control mb-3 eosinabox_lowercase" placeholder="to">
+        <input  id="eosinabox_transfer_to"       type="text" class="form-control mb-3 eosinabox_lowercase" placeholder="to" autocorrect="off" autocapitalize="none">
         <input  id="eosinabox_transfer_quantity" type="text" class="form-control mb-3 eosinabox_uppercase" placeholder="0.0000 EOS" autocomplete="off">
         <input  id="eosinabox_transfer_memo"     type="text" class="form-control mb-2" placeholder="memo">
         <button id="eosinabox_transfer_transact" class="btn btn-primary btn-sm" type="submit">Send Transaction</button>
@@ -176,13 +176,13 @@
       </div>
       <div class="row">
         <div class="col">
-          <input id="eosinabox_accountName" type="text" class="form-control mb-4" placeholder="account name">
+          <input id="eosinabox_accountName" type="text" class="form-control mb-4" placeholder="account name" autocorrect="off" autocapitalize="none">
           <div id="eosinabox_countAccountLen"></div>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <input id="eosinabox_custodianAccountName" type="text" class="form-control mb-4" placeholder="custodian account name">
+          <input id="eosinabox_custodianAccountName" type="text" class="form-control mb-4" placeholder="custodian account name" autocorrect="off" autocapitalize="none">
           <div id="eosinabox_countCustodianAccountLen"></div>
         </div>
       </div>
@@ -195,7 +195,7 @@
       <div class="row">
         <div class="col">
           <div id="eosinabox_esr" class="text-break"></div>
-          <button id="eosinabox_share" class="btn btn-primary btn-sm" type="submit">Share My Account Creation Request</button>
+          <button id="eosinabox_share" class="btn btn-primary btn-sm" type="submit">Copy My Account Creation Request</button>
         </div>
       </div>
     </div>
@@ -231,12 +231,12 @@
       </div>
       <div class="row">
         <div class="col">
-          <input type="text" class="form-control mb-4 eosinabox_custodianAccountNameInvite eosinabox_lowercase" placeholder="custodian account name">
+          <input type="text" class="form-control mb-4 eosinabox_custodianAccountNameInvite eosinabox_lowercase" placeholder="custodian account name" autocorrect="off" autocapitalize="none">
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <button class="eosinabox_share_inviteFriend btn btn-primary btn-sm" type="submit">Share My Invite A Friend Request</button>
+          <button class="eosinabox_share_inviteFriend btn btn-primary btn-sm" type="submit">Copy My Invite A Friend Request</button>
         </div>
       </div>
     </div>
@@ -273,7 +273,7 @@
       </div>
       <div class="row">
         <div class="col">
-          <input type="text" class="eosinabox_accountNameClass form-control mb-4 eosinabox_lowercase" placeholder="account name">
+          <input type="text" class="eosinabox_accountNameClass form-control mb-4 eosinabox_lowercase" placeholder="account name" autocorrect="off" autocapitalize="none">
           <div class="eosinabox_countAccountLenClass"></div>
         </div>
       </div>
@@ -286,7 +286,7 @@
       <div class="row">
         <div class="col">
           <div class="text-break eosinabox_esrClass"></div>
-          <button class="btn btn-primary btn-sm eosinabox_shareRestore" type="submit">Share My Account Restore Request</button>
+          <button class="btn btn-primary btn-sm eosinabox_shareRestore" type="submit">Copy My Account Restore Request</button>
         </div>
       </div>
     </div>
@@ -440,10 +440,7 @@
           <h2 class="eosinabox_help_header">Too Long; Didn't Read</h2>
           <div class="eosinabox_help">
             <ol>
-              <li>A simple front end web wallet for the EOS blockchain</li>
-              <li>Blockchain uses a system of key pairs</li>
-              <li>Private keys should be kept private, you use them to send transactions from your account to the blockchain</li>
-              <li>Public Keys are public, they are related to the private keys and allow the blockchain to verifie your transactions are valid</li>
+              <li>Web wallet for the EOS blockchain</li>
               <li>EOS blockchain has a permission system with an everyday key, called "Active" and a master key called "Owner"</li>
               <li>EOS in a Box creates accounts on the EOS blockchain with an easy and secure "Active" key leveraging your phone's built-in hardware security module with Face-ID or fingerprints</li>
               <li>EOS in a Box requires a "Custodian" account in case your phone gets stolen or breaks</li>

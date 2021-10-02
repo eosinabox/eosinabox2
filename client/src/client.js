@@ -65,15 +65,18 @@ const consoleLog = async (logObj) => {
   });
 }
 const callMyShare = (txtToShare) => {
-  if(navigator.share){
-    navigator.share({ text: txtToShare }); // url: ?
-  }else{
+  // make behavior uniform across iOS and Android, sacrifice the nice "share" feature which is only avalable in Android
+  // Now the buttons can say "copy" and the user has the same behavior on both platforms.
+  //
+  // if(navigator.share){
+  //   navigator.share({ text: txtToShare }); // url: ?
+  // }else{
     navigator.clipboard.writeText(txtToShare).then(function() {
-      console.log('Async: Copying to clipboard was successful!');
+      eosinaboxToast('Copied to clipboard, you can share now by pasting');
     }, function(err) {
-      console.error('Async: Could not copy text: ', err);
+      consoleLog('Async: Could not copy text: ', err);
     });
-  }
+  // }
 }
 const detectOs = () => {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -177,15 +180,12 @@ $(() => {
     const rpc = new eosjs_jsonrpc.JsonRpc(gChain[chain]);
     try{
       let acc = await rpc.get_account(accToCheck);
-      console.log('ACCOUNT:::', acc);
       callback({ accountAvailable: false });
     }
     catch(err){
       if(!!err.details && !!err.details[0].message && err.details[0].message.substr(0,11) == 'unknown key'){
-        console.log('Account not found - great news!!');
         callback({ accountAvailable: true });
       }else{
-        console.log('AMIHDEBUG error, account not found??', err);
         callback({ accountAvailable: false });
       }
     }
@@ -201,15 +201,13 @@ $(() => {
     return response.json();
   }
   const updateBalance = async (chain) => {
+    $('#eosinabox_balance').html('...');
     if((typeof chain=='object') || chain==null){
       chain = gState.chain;
     }
     if(!chain){ chain = 'jungle3'; } // still no chain?? fall back to jungle3
     // const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
-    console.log("[await getAccountInfo]", getCurrentAccountChain(), getCurrentAccountName());
     const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
-    // console.log('bal::', balance);
-    // consoleLog({ logMsg: 'getAccountInfo', chain, accountInfo, balance });
     if(!!accountInfo.errMsg){
       $('#eosinabox_balance').html( `Account not found <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
       $('#eosinabox_power1').html( `perhaps the custodian` );
@@ -265,7 +263,6 @@ $(() => {
       // the authData contains the pubKey and we will *maybe* check the attestation later, in a future version
     };
     const credential = await navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions });
-    console.log('credential', credential);
     const credForServer = {
       rpid: rp.id,
       id: eosjs_serialize.arrayToHex(new Uint8Array(credential.rawId)),
@@ -281,12 +278,10 @@ $(() => {
     })
     .then(response => response.json())
     .then(async data => {
-      console.log('AMIHDEBUG did we get back the Pubkey from the server?', data);
       gState.pubkey = true;
       $('#eosinabox_pubkey').html(data.pubkey);
       // save in localStorage
       let credentialIdHex = eosjs_serialize.arrayToHex(new Uint8Array(credential.rawId));
-      console.log('pubkeyAsHex: ', credentialIdHex);
       if( !localStorage['eosinabox_pubkeys'] ){
         localStorage['eosinabox_pubkeys'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }else{
@@ -323,7 +318,6 @@ $(() => {
     }
     const rpc = new eosjs_jsonrpc.JsonRpc(gChain[gState.chain]);
     const api = new eosjs_api.Api({ rpc, signatureProvider });
-    console.log('[eosinbox_approveThisTransaction] [sharedInfo]' + localStorage.sharedInfo);
     let o = JSON.parse(localStorage.sharedInfo);
     // https://eosinabox.com/#sharedInfo?
     // action=createAccount&
@@ -331,7 +325,6 @@ $(() => {
     // accountName=cggdggffgyft&
     // custodianAccountName=webauthn1111&
     // pubkey=PUB_WA_AwTqYqJEwQ3B4bzNGyxHT25qZCxRfrjgYnshr97otStVYZJ7uA5EAkEey2RoKZCyu7pxaAStoGV1ieCc3tUk
-    console.log('[eosinbox_approveThisTransaction] sharedInfo:', o);
     try {
       const result = await api.transact({
         // actions: [{
@@ -467,7 +460,7 @@ $(() => {
       eosinaboxToast('Transaction sent');
       setTimeout(()=>{
         updateBalance(gState.chain);
-      }, 1000);
+      }, 3000);
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       if(error.message.includes('too high')){
@@ -586,7 +579,6 @@ $(() => {
         `inviteToCreateAccount&chain=${gState.chain}` +
         `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
     }
-    // navigator.share(shareInfo);
     callMyShare( shareInfo.url );
   });
 
@@ -598,9 +590,6 @@ $(() => {
     localStorage.currentAccount = gState.chain + ':' + $('#eosinabox_accountName').val().toLowerCase();
     addAccountToLocalStorage(localStorage.currentAccount);
     localStorage.currentChain   = gState.chain;
-    // navigator.share({ url: `https://eosinabox.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&accountName=${gState.shareEssentials.accountName}` +
-    //   `&pubkey=${gState.shareEssentials.pubkey}`
-    // });
     callMyShare(`https://eosinabox.com/#sharedInfo?action=restoreAccount&chain=${gState.chain}&` +
       `accountName=${gState.shareEssentials.accountName}` +
       `&pubkey=${gState.shareEssentials.pubkey}`
@@ -635,11 +624,8 @@ $(() => {
     $('.eosinabox_page').hide();
     const href = e.target.href.split('#')[1];
     $(`.eosinabox_page_${href}`).show();
-    console.log('menu element:::', href);
   });
   $('.eosinabox_dropdown_blockchain a.dropdown-item').on('click', (e)=>{
-    console.log('data-chain:', $(e.target).data('chain'));
-    console.log('text: ', $(e.target).text());
     // gState.chain = $(e.target).data('chain').toLowerCase(); // bug! returns the wrong info!
     if( $(e.target).text()=='EOS' ){
       gState.chain = 'eos';
@@ -702,14 +688,12 @@ $(() => {
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_sharedInfo`).show();
     }else if(o.action == 'inviteToCreateAccount'){
-      console.log('[onLoad][invite][1] o:', o);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
       $('#eosinabox_custodianAccountName').val(o.custodianAccountName);
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_createAccount`).show();
     }else if(o.action == 'restoreAccount'){
-      console.log('[onLoad][restoreAccount][1] o:', o);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
       $('.eosinabox_accountNameClassRestoreAccountTransaction').val(o.accountName);
