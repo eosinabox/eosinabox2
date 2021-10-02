@@ -58,6 +58,7 @@ const getCurrentAccountChain = () => {
     return 'jungle3';
   }else{
     if(part[1]==''){
+      localStorage.currentAccount = JSON.parse(localStorage.allAccounts)[0];
       JSON.parse(localStorage.allAccounts)[0].split(':')[0];
     }else{
       return part[0];
