@@ -445,7 +445,6 @@ $(() => {
     consoleLog({ fromMsg:'eosinabox_transfer_transact [3]' });
     const api = new eosjs_api.Api({ rpc, signatureProvider });
     consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
-    console.log('[eosinbox_signTransaction] [click] [5]');
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
     const quantity = $('#eosinabox_transfer_quantity').val();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
