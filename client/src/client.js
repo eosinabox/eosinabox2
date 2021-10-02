@@ -467,8 +467,8 @@ $(() => {
       $('#eosinabox_transfer_memo'    ).val('');
       setTimeout(()=>{
         updateBalance(gState.chain);
+        eosinaboxToast('Transaction sent');
       }, 1000);
-      eosinaboxToast('Transaction sent');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       if(error.message.includes('too high')){
