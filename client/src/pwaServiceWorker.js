@@ -18,17 +18,15 @@ self.addEventListener('install', function(e) {
 
 /* Serve cached content but also get from server for next time */
 self.addEventListener('fetch', function(e) {
-  console.log('[pwaServiceWorker][fetch][0]', e.request );
   if(e.request.method=='POST'){
-    console.log('[pwaServiceWorker][fetch][POST][a]' );
     fetch(e.request).then(function (response) {
-      console.log('[pwaServiceWorker][fetch][POST][b]' );
+      console.log('[pwaServiceWorker][fetch][POST][b]', e.request.url );
       return response;
     });
   }else{
     e.respondWith(
       caches.match(e.request).then(function(cachedResponse) {
-        console.log('[pwaServiceWorker][fetch][1]');
+        console.log('[pwaServiceWorker][fetch][1]', e.request.url);
         fetch(e.request).then(function (response) {
           console.log('[pwaServiceWorker][fetch][2]' );
           caches.open(cacheName).then(function(cache) {

@@ -53,6 +53,7 @@ const getCurrentAccountChain = () => {
   }
 }
 const consoleLog = async (logObj) => {
+  console.log('[consoleLog] ', logObj);
   await fetch('/consoleLog', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
