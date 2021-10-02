@@ -40,7 +40,11 @@ const getCurrentAccountName = () => {
   }else if(part.length==1){
     return part[0];
   }else{
-    return part[1];
+    if(part[1]==''){
+      JSON.parse(localStorage.allAccounts)[0].split(':')[1];
+    }else{
+      return part[1];
+    }
   }
 }
 const getCurrentAccountChain = () => {
@@ -53,7 +57,11 @@ const getCurrentAccountChain = () => {
   }else if(part.length==1){
     return 'jungle3';
   }else{
-    return part[0];
+    if(part[1]==''){
+      JSON.parse(localStorage.allAccounts)[0].split(':')[0];
+    }else{
+      return part[0];
+    }
   }
 }
 const consoleLog = async (logObj) => {
