@@ -10,6 +10,7 @@ const gChain = {
   eos    : 'https://api.eos.cryptolions.io',
 }
 const eosinaboxToast = (msg) => {
+  console.log('[eosinaboxToast]', msg);
   $('.toast-body').html(msg);
   $('.toast').show();
 }
