@@ -19,6 +19,7 @@ self.addEventListener('install', function(e) {
 /* Serve cached content but also get from server for next time */
 self.addEventListener('fetch', function(e) {
   if(e.request.method=='POST'){
+    console.log('[pwaServiceWorker][fetch][POST][a]', e.request.url );
     fetch(e.request).then(function (response) {
       console.log('[pwaServiceWorker][fetch][POST][b]', e.request.url );
       return response;

@@ -436,20 +436,14 @@ $(() => {
     const signatureProvider = new eosjs_wasig.WebAuthnSignatureProvider();
     signatureProvider.keys.clear();
     const keys = JSON.parse( localStorage.eosinabox_pubkeys );
-    consoleLog({ fromMsg:'eosinabox_transfer_transact [0]', keys });
     for (const key of keys){
-      consoleLog({ fromMsg:'eosinabox_transfer_transact [1]', key });
       signatureProvider.keys.set(key.key, key.credentialId);
     }
-    consoleLog({ fromMsg:'eosinabox_transfer_transact [2]' });
     const rpc = new eosjs_jsonrpc.JsonRpc(gChain[getCurrentAccountChain()]);
-    consoleLog({ fromMsg:'eosinabox_transfer_transact [3]' });
     const api = new eosjs_api.Api({ rpc, signatureProvider });
-    consoleLog({ fromMsg:'eosinabox_transfer_transact [4]' });
     const to       = $('#eosinabox_transfer_to'      ).val().toLowerCase();
     const quantity = $('#eosinabox_transfer_quantity').val();
     const memo     = $('#eosinabox_transfer_memo'    ).val();
-    console.log('from, to, quant, memo:', localStorage.currentAccount, to, quantity, memo);
     try {
       const result = await api.transact({
         actions: [{
