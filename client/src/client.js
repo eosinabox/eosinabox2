@@ -645,6 +645,7 @@ $(() => {
   });
   // onLoad
   /////////
+  $('.toast').toast('hide'); // aarg! why is the toast not showing but blocking the elements under it?
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./pwaServiceWorker.js');
   }
