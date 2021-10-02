@@ -30,6 +30,6 @@ self.addEventListener('fetch', function(e) {
         });
       });
       return cachedResponse;
-    }).catch(function(err){ console.log('[pwaServiceWorker][fetch] ERR 'err); })
+    }).catch(function(err){ console.log('[pwaServiceWorker][fetch] ERR ', err); })
   );
 });
