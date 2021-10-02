@@ -11,7 +11,7 @@ const gChain = {
 }
 const eosinaboxToast = (msg) => {
   $('.toast-body').html(msg);
-  $('.toast').toast('show');
+  $('.toast').show().toast('show');
 }
 const repopulateMyAccounts = () => {
   const accoultListString = localStorage.allAccounts;
@@ -646,6 +646,7 @@ $(() => {
   // onLoad
   /////////
   $('.toast').hide(); // aarg! why is the toast not showing but blocking the elements under it?
+  $('.toast').on('hidden.bs.toast', ()=> { $('.toast').hide(); })
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./pwaServiceWorker.js');
   }
