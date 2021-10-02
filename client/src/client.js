@@ -10,9 +10,8 @@ const gChain = {
   eos    : 'https://api.eos.cryptolions.io',
 }
 const eosinaboxToast = (msg) => {
-  console.log('[eosinaboxToast]', msg);
   $('.toast-body').html(msg);
-  $('.toast').show();
+  $('.toast').toast('show');
 }
 const repopulateMyAccounts = () => {
   const accoultListString = localStorage.allAccounts;
@@ -465,9 +464,9 @@ $(() => {
       $('#eosinabox_transfer_to'      ).val('');
       $('#eosinabox_transfer_quantity').val('');
       $('#eosinabox_transfer_memo'    ).val('');
+      eosinaboxToast('Transaction sent');
       setTimeout(()=>{
         updateBalance(gState.chain);
-        eosinaboxToast('Transaction sent');
       }, 1000);
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
