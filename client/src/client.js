@@ -9,6 +9,10 @@ const gChain = {
   jungle3: 'https://jungle3.cryptolions.io',
   eos    : 'https://api.eos.cryptolions.io',
 }
+const eosinaboxToast = (msg) => {
+  $('.toast-body').html(msg);
+  $('.toast').show();
+}
 const repopulateMyAccounts = () => {
   const accoultListString = localStorage.allAccounts;
   let accountList = []; if(!!accoultListString){ accountList = JSON.parse(accoultListString); }
@@ -161,11 +165,11 @@ $(() => {
   }
   const checkIfAccountNameIsAvailable = async (chain, accToCheck, callback) => {
     if(accToCheck.length != 12){
-      alert(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
+      eosinaboxToast(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
       consoleLog( { consoleLog: 'account length failed', accToCheck });
       return;
     }else if(!/^[a-z1-5]{12}$/.test(accToCheck)){
-      alert('The account name contains illegal characters. Characters should be in the range: a-z or 1-5, please fix and try again.');
+      eosinaboxToast('The account name contains illegal characters. Characters should be in the range: a-z or 1-5, please fix and try again.');
       consoleLog( { consoleLog: 'account validation failed', accToCheck });
       return;
     }
@@ -303,7 +307,7 @@ $(() => {
   });
   ///////////////////////////////////////////////////////////////////////////////////
   $('#eosinbox_declineTransaction').on('click', async (event) => {
-    alert('Deleting this transaction.');
+    eosinaboxToast('Deleting this transaction.');
     localStorage.sharedInfo = '';
     $('.eosinabox_page').hide();
     $(`.eosinabox_page_myAccount`).show();
@@ -402,7 +406,7 @@ $(() => {
         expireSeconds: 60,
       });
       consoleLog( {logMsg: 'createdAccount!', result } );
-      alert('Transaction sent, let the other person know you created their account and send them some EOS!');
+      eosinaboxToast('Transaction sent, let the other person know you created their account and send them some EOS!');
       localStorage.sharedInfo = '';
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_myAccount`).show();
@@ -411,7 +415,7 @@ $(() => {
       $('#eosinabox_transfer_memo').html('Initial EOS transfer using EOS-in-a-Box 🌈');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
-      alert('Transaction failed with error, ' + error.message);
+      eosinaboxToast('Transaction failed with error, ' + error.message);
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////
@@ -460,14 +464,16 @@ $(() => {
       $('#eosinabox_transfer_to'      ).val('');
       $('#eosinabox_transfer_quantity').val('');
       $('#eosinabox_transfer_memo'    ).val('');
-      try { await updateBalance(gState.chain); } catch (error) { consoleLog({ msg: 'updateBalanceErr:327', error }); }
-      alert('Transaction sent');
+      setTimeout(()=>{
+        updateBalance(gState.chain);
+      }, 1000);
+      eosinaboxToast('Transaction sent');
     } catch (error) {
       consoleLog( {logMsg: 'transfer EOS error!', error } );
       if(error.message.includes('too high')){
-        alert('You need to power up the account first, check the help page, ' + error.message);
+        eosinaboxToast('You need to power up the account first, check the help page, ' + error.message);
       }else{
-        alert('Transaction failed with error, ' + error.message);
+        eosinaboxToast('Transaction failed with error, ' + error.message);
       }
     }
   });
@@ -511,10 +517,10 @@ $(() => {
       consoleLog( {logMsg: 'replaceKeys!', result } );
       $('.eosinabox_accountNameClassRestoreAccountTransaction').html('');
       $('.eosinabox_pubkeyClassRestoreAccountTransaction'     ).html('');
-      alert('Transaction sent - key change');
+      eosinaboxToast('Transaction sent - key change');
     } catch (error) {
       consoleLog( {logMsg: 'transaction - key change error!', error } );
-      alert('Transaction - key change failed with error, ' + error.message);
+      eosinaboxToast('Transaction - key change failed with error, ' + error.message);
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////
@@ -654,9 +660,9 @@ $(() => {
   if(typeof(PublicKeyCredential)=='undefined'){ // won't work if browser is not modern
     const os = detectOs();
     if(os=='ios'){
-      alert('Please use a modern browser, on Apple that would be Safari.');
+      eosinaboxToast('Please use a modern browser, on Apple that would be Safari.');
     }else{
-      alert('Please use a modern browser, on Android that would be Google Chrome.');
+      eosinaboxToast('Please use a modern browser, on Android that would be Google Chrome.');
     }
     consoleLog({ errMsg: 'PublicKeyCredential_undefined', message: 'Please use a modern browser to use this app.' });
   }
