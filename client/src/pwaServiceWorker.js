@@ -20,6 +20,10 @@ self.addEventListener('install', function(e) {
 self.addEventListener('fetch', function(e) {
   if(e.request.method=='POST'){
     console.log('[pwaServiceWorker][fetch][POST][a]', e.request.url );
+    if(e.request.url.includes('v1/chain/push_transaction')){
+      console.log('[pwaServiceWorker][fetch][POST][A ha! skip push transaction!]' );
+      return;
+    }
     fetch(e.request).then(function (response) {
       console.log('[pwaServiceWorker][fetch][POST][b]', e.request.url );
       return response;
