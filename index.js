@@ -34,21 +34,13 @@ const chain = {
 /**
  * Routes Definitions
  */
-app.get("/", (req, res) => {
-  res.sendFile( path.join(__dirname, 'client/src', 'index.html') );
-});
-app.get("/:filename", (req, res) => {
-  res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
-});
-app.get("/client/src/:filename", (req, res) => {
-  res.sendFile( path.join(__dirname, 'client/src', req.params.filename) );
-});
-app.get("/icons/:filename", (req, res) => {
-  res.sendFile( path.join(__dirname, 'client/src/icons', req.params.filename) );
-});
-app.get("/client/src/eosjs/dist-web/:filename", (req, res) => {
-  res.sendFile( path.join(__dirname, 'client/src/eosjs/dist-web', req.params.filename) );
-});
+const src = 'client/src';
+const srceos = 'client/src/eosjs/dist-web';
+app.get("/"                   , (req, res) => { res.sendFile( path.join(__dirname, `${src}`      , 'index.html'       ) ); });
+app.get("/:filename"          , (req, res) => { res.sendFile( path.join(__dirname, `${src}`      , req.params.filename) ); });
+app.get(`/${src}/:filename`   , (req, res) => { res.sendFile( path.join(__dirname, `${src}`      , req.params.filename) ); });
+app.get("/icons/:filename"    , (req, res) => { res.sendFile( path.join(__dirname, `${src}/icons`, req.params.filename) ); });
+app.get(`/${srceos}/:filename`, (req, res) => { res.sendFile( path.join(__dirname, `${srceos}`   , req.params.filename) ); });
 app.post("/consoleLog", (req, res) => {
   console.log('[consoleLog][headers]:', req.headers['x-real-ip'] + '; ' + req.headers['user-agent'] + '; ' +   req.headers['referer'] + '; ' +   req.headers['origin'] + '; ');
   console.log('[consoleLog]:::', JSON.stringify(req.body, null, 2));
