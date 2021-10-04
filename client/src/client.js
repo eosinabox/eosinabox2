@@ -254,11 +254,12 @@ $(() => {
       }else{
         const response = await fetch('https://api.eospowerup.io/freePowerup/' + getCurrentAccountName());
         consoleLog({ freepowerup: response });
+        eosinaboxToast('Free PowerUp can be used once every 12 hours');
         setTimeout(()=>{
           updateBalance();
-          $('#eosinabox_powerup_gauge svg').animate({'background-color': 'lightgreen'}, 2000);
+          $('#eosinabox_powerup_gauge svg').css('background-color', 'transparent');
           eosinaboxToast('Free PowerUp can be used once every 12 hours');
-        }, 2000);
+        }, 4000);
       }
     }
   });
