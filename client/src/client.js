@@ -250,7 +250,7 @@ $(() => {
   $('#eosinabox_powerup_gauge svg').on('click', async () => {
     if(gState.gaugeEstimatedNumOfTx < 4){
       if(getCurrentAccountChain() == 'jungle3'){
-        alert('integration only available on the EOS chain, not on the Jungle3 test-net.');
+        eosinaboxToast('Please use the Help menu link manually for Jungle3 accounts');
       }else{
         const response = await fetch('https://api.eospowerup.io/freePowerup/' + getCurrentAccountName());
         consoleLog({ freepowerup: response });
