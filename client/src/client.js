@@ -247,7 +247,7 @@ $(() => {
       }
     }
   };
-  $('#eosinabox_powerup_gauge svg').on('click', () => {
+  $('#eosinabox_powerup_gauge svg').on('click', async () => {
     if(gState.gaugeEstimatedNumOfTx < 4){
       if(getCurrentAccountChain() == 'jungle3'){
         alert('integration only available on the EOS chain, not on the Jungle3 test-net.');
