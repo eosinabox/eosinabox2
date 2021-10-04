@@ -3,7 +3,8 @@ var gState = {
   accountName: false,
   custodianAccountName: false,
   pubkey: false,
-  esr: ''
+  esr: '',
+  gaugeEstimatedNumOfTx: 9999
 };
 const gChain = {
   jungle3: 'https://jungle3.cryptolions.io',
@@ -240,8 +241,27 @@ $(() => {
       const gaugeMin = 5, gaugeMax = 175;
       const gaugeAngle = gaugeMin + (gaugeMax - gaugeMin) * gaugeSigmoid;
       $('#eosinabox_powerup_gauge svg #dial')[0].setAttribute('transform','rotate(' + gaugeAngle + ' 150 150 )');
+      if(gaugeEstimatedNumOfTx < 4){
+        gState.gaugeEstimatedNumOfTx = gaugeEstimatedNumOfTx;
+        $('#eosinabox_powerup_gauge svg').css('background-color', 'lightgreen');
+      }
     }
   };
+  $('#eosinabox_powerup_gauge svg').on('click', () => {
+    if(gState.gaugeEstimatedNumOfTx < 4){
+      if(getCurrentAccountChain() == 'jungle3'){
+        alert('integration only available on the EOS chain, not on the Jungle3 test-net.');
+      }else{
+        const response = await fetch('https://api.eospowerup.io/freePowerup/' + getCurrentAccountName());
+        consoleLog({ freepowerup: response });
+        setTimeout(()=>{
+          updateBalance();
+          $('#eosinabox_powerup_gauge svg').animate({'background-color': 'lightgreen'}, 2000);
+          eosinaboxToast('Free PowerUp can be used once every 12 hours');
+        }, 2000);
+      }
+    }
+  });
   $('#eosinbox_createKeys, .eosinbox_createKeysClass').on('click', async (event) => {
     event.preventDefault();
     // AMIHDEBUG TODO: generate random string on server and manage it in a session,
