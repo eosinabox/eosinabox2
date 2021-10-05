@@ -241,9 +241,11 @@ $(() => {
       const gaugeMin = 5, gaugeMax = 175;
       const gaugeAngle = gaugeMin + (gaugeMax - gaugeMin) * gaugeSigmoid;
       $('#eosinabox_powerup_gauge svg #dial')[0].setAttribute('transform','rotate(' + gaugeAngle + ' 150 150 )');
+      gState.gaugeEstimatedNumOfTx = gaugeEstimatedNumOfTx;
       if(gaugeEstimatedNumOfTx < 4){
-        gState.gaugeEstimatedNumOfTx = gaugeEstimatedNumOfTx;
         $('#eosinabox_powerup_gauge svg').css('background-color', 'lightgreen');
+      }else{
+        $('#eosinabox_powerup_gauge svg').css('background-color', 'transparent');
       }
     }
   };
@@ -259,7 +261,7 @@ $(() => {
           updateBalance();
           $('#eosinabox_powerup_gauge svg').css('background-color', 'transparent');
           eosinaboxToast('Free PowerUp can be used once every 12 hours');
-        }, 4000);
+        }, 5000);
       }
     }
   });
