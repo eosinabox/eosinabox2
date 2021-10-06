@@ -108,6 +108,7 @@
       input:checked + .slider:before { transform: translateX(calc( 50px - 15px )); }
       .eosinabox_page_createAccount .wizard { display: none; }
       .eosinabox_page_createAccount .wizard0 { display: block; }
+      .eosinabox_help_technical { display: none; }
     </style>
   </head>
   <body>
@@ -533,6 +534,13 @@
               This is also why you need to use the custodian account to replace keys if you switch phones.
             </p>
             <button id="eosinabox_share_backup_debug" class="btn btn-primary btn-sm" type="submit">Backup My Account Info</button>
+            <h5 class="eosinabox_help_technical_header">Technical...</h5>
+            <div class="eosinabox_help_technical">
+              <p>
+                Some special tools, like manual clear of account info from this phone's localStorage. Ignore if you're not a programmer :)
+              </p>
+              <button class="eosinabox_help_technical_deleteAllAccounts" class="btn btn-danger btn-sm" type="submit">Delete all accounts - for testing</button>
+            </div>
             <h5>Telegram group, chat, complain...</h5>
             <a href="https://t.me/EOSinaBox" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">EOS in a Box on Telegram</a>
           </div>

@@ -314,6 +314,16 @@ $(() => {
       wizardTo(4);
     }
   });
+  $('.eosinabox_help_technical_header').on('click', () => {
+    $('.eosinabox_help_technical').fadeToggle();
+  });
+  $('.eosinabox_help_technical_deleteAllAccounts').on('click', ()=>{
+    if (confirm('Are you sure you want to delete all info?')) {
+      localStorage.allAccounts = '';
+      localStorage.currentAccount=''
+      gotoHome();
+    }
+  });
   $('#eosinabox_powerup_gauge svg').on('click', async () => {
     if(gState.gaugeEstimatedNumOfTx < 4){
       if(getCurrentAccountChain() == 'jungle3'){
@@ -723,12 +733,12 @@ $(() => {
     $(`.eosinabox_page_${href}`).show();
   });
   $('.eosinabox_dropdown_blockchain a.dropdown-item').on('click', (e)=>{
-    // gState.chain = $(e.target).data('chain').toLowerCase(); // bug! returns the wrong info!
     if( $(e.target).text()=='EOS' ){
       gState.chain = 'eos';
     }else{
       gState.chain = 'jungle3';
     }
+    $('.eosinabox_dropdown_blockchain .btn').removeClass('btn-outline-danger').addClass('btn-outline-primary');
     $('.eosinabox_dropdown_blockchain>button').html(`${$(e.target).text()} `);
   });
   // onLoad
