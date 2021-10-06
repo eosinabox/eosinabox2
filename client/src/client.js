@@ -25,6 +25,8 @@ const repopulateMyAccounts = () => {
   $('.eosinabox_transfer_fromMyAccounts .dropdown-menu').append(s);
 }
 const addAccountToLocalStorage = (accountWithChainPrefix) => {
+  const parts = accountWithChainPrefix.split(':');
+  if(parts.length<2 || parts[0].length==0 || parts[1].length==0){ return; }
   const accoultListString = localStorage.allAccounts;
   let accountList = []; if(!!accoultListString){ accountList = JSON.parse(accoultListString); }
   accountList.push(accountWithChainPrefix);
@@ -103,12 +105,14 @@ const detectOs = () => {
   }
   return 'notPhone';
 }
+window.onerror = function errorHandler(msg, url, line) {
+  consoleLog({ logMsg: 'clientSideError', arguments });
+  return false; // Just let default handler run.
+}
 $(() => {
-  window.onerror = function errorHandler(msg, url, line) {
-    consoleLog({ logMsg: 'clientSideError', arguments });
-    return false; // Just let default handler run.
-  }
   $('#eosinabox_accountName').on('input', (e) => {
+    $('#eosinabox_accountName')[0].setCustomValidity('');
+    $('#eosinabox_accountName')[0].reportValidity();
     $('#eosinabox_accountName').val( $('#eosinabox_accountName').val().toLowerCase() );
     const len = $('#eosinabox_accountName').val().length;
     if(len > 12){
@@ -128,7 +132,7 @@ $(() => {
         }
       });
     }
-    checkIfAllConditionsMet();
+    // checkIfAllConditionsMet();
   });
   $('#esinabox_check_availability').on('click', (event)=>{
     event.preventDefault();
@@ -140,10 +144,12 @@ $(() => {
         gState.accountName = false;
         $('#eosinabox_countAccountLen').html('Account is already taken, please try another name');
       }
-      checkIfAllConditionsMet();
+      // checkIfAllConditionsMet();
     });
   });
   $('#eosinabox_custodianAccountName').on('input', (e) => {
+    $('#eosinabox_custodianAccountName')[0].setCustomValidity('');
+    $('#eosinabox_custodianAccountName')[0].reportValidity();
     $('#eosinabox_custodianAccountName').val( $('#eosinabox_custodianAccountName').val().toLowerCase() );
     const len = $('#eosinabox_custodianAccountName').val().length;
     if(len > 12){
@@ -163,30 +169,27 @@ $(() => {
         }
       });
     }
-    checkIfAllConditionsMet();
+    // checkIfAllConditionsMet();
   });
-  const checkIfAllConditionsMet = () => {
-    // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
-    if(gState.accountName && gState.pubkey
-      && (gState.custodianAccountName || $('#eosinabox_custodianAccountName').val().length>2)){
-      $('#eosinbox_createKeys' ).hide();
-      $('#eosinabox_share').show();
-    }else{
-      $('#eosinbox_createKeys' ).show();
-      $('#eosinabox_share').hide();
-    }
-  }
+  // const checkIfAllConditionsMet = () => {
+  //   // if there's a new account name, an existing custodian name and a public key, hide the create key button and show the prepareEsr key
+  //   if(gState.accountName && gState.pubkey
+  //     && (gState.custodianAccountName || $('#eosinabox_custodianAccountName').val().length>2)){
+  //     $('#eosinbox_createKeys' ).hide();
+  //     $('#eosinabox_share').show();
+  //   }else{
+  //     $('#eosinbox_createKeys' ).show();
+  //     $('#eosinabox_share').hide();
+  //   }
+  // }
   const checkIfAccountNameIsAvailable = async (chain, accToCheck, callback) => {
     if(accToCheck.length != 12){
       eosinaboxToast(`Account name should be 12 characters long, it is ${accToCheck.length}, try again`);
-      consoleLog( { consoleLog: 'account length failed', accToCheck });
       return;
     }else if(!/^[a-z1-5]{12}$/.test(accToCheck)){
       eosinaboxToast('The account name contains illegal characters. Characters should be in the range: a-z or 1-5, please fix and try again.');
-      consoleLog( { consoleLog: 'account validation failed', accToCheck });
       return;
     }
-    consoleLog( { consoleLog: 'check if account name is available', accToCheck });
     const rpc = new eosjs_jsonrpc.JsonRpc(gChain[chain]);
     try{
       let acc = await rpc.get_account(accToCheck);
@@ -217,17 +220,14 @@ $(() => {
     }
     if(!chain){ chain = 'jungle3'; } // still no chain?? fall back to jungle3
     // const balance = await getCurrencyBalance( getCurrentAccountChain(), 'eosio.token', getCurrentAccountName(),'EOS' );
-    const accountInfo = await getAccountInfo( getCurrentAccountChain(), getCurrentAccountName() );
-    if(!!accountInfo.errMsg){
+    const currentAccCh = getCurrentAccountChain();
+    const currentAccNm = getCurrentAccountName();
+    const accountInfo = await getAccountInfo( currentAccCh, currentAccNm );
+    if(!!accountInfo.errMsg || currentAccNm=='no account yet...'){
       $('#eosinabox_balance').html( `Account not found <i class="eosinabox_viewOnExplorer bi bi-eye h6 text-primary"></i>` );
       $('#eosinabox_power1').html( `perhaps the custodian` );
       $('#eosinabox_power2').html( `needs to create it for you` );
     }else{
-      consoleLog({ logMsg: 'getAccountInfo[2az]',
-        liqBal    : accountInfo.core_liquid_balance,
-        netLimitAv: accountInfo.net_limit.available,
-        cpuLimitAv: accountInfo.cpu_limit.available,
-      });
       $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h2"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h2 text-primary"></i>` );
       $('#eosinabox_power1').html( `NET available: ${Number.parseFloat(accountInfo.net_limit.available/1024).toFixed(2)} KB` );
       $('#eosinabox_power2').html( `CPU available: ${Number.parseFloat(accountInfo.cpu_limit.available/1000).toFixed(2)} ms` );
@@ -249,6 +249,71 @@ $(() => {
       }
     }
   };
+  const wizardTo = (stepTo) => {
+    $('.eosinabox_page_createAccount .wizard')
+    .fadeOut().promise().done( () => {
+      $(`.eosinabox_page_createAccount .wizard${stepTo}`).fadeIn();
+    });
+  }
+  const gotoHome = () => {
+    $('.eosinabox_page').hide();
+    if(!localStorage.allAccounts){
+      $(`.eosinabox_page_createAccount`).show();
+    }else{
+      $(`.eosinabox_page_myAccount`).show();
+      $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+    }
+  }
+  $('.eosinabox_page_createAccount .wizard .idonotagree').on('click', () => {
+    wizardTo(0);
+    gotoHome();
+  });
+  $('.eosinabox_page_createAccount .wizard .next').on('click', (e)=> {
+    if(e.currentTarget.parentElement.parentElement.classList.contains('wizard0')){
+      if($('.eosinabox_dropdown_blockchain>button').html().trim() == 'Choose A Chain: ...'){
+        $('.eosinabox_dropdown_blockchain .btn').removeClass('btn-outline-primary').addClass('btn-outline-danger');
+        return;
+      }
+      $('.eosinabox_dropdown_blockchain .btn').removeClass('btn-outline-danger').addClass('btn-outline-primary');
+      wizardTo(1);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard1')){
+      if(!gState.accountName){
+        $('#eosinabox_accountName')[0].setCustomValidity('Please choose a valid account name')
+        $('#eosinabox_accountName')[0].reportValidity()
+        return;
+      }
+      wizardTo(2);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard2')){
+      // "I agree" == "next"
+      wizardTo(3);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard3')){
+      if(!gState.custodianAccountName){
+        $('#eosinabox_custodianAccountName')[0].setCustomValidity('Please choose a real custody account');
+        $('#eosinabox_custodianAccountName')[0].reportValidity();
+        return;
+      }
+      wizardTo(4);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard4')){
+      wizardTo(5);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard5')){
+      wizardTo(5);
+    }
+  });
+  $('.eosinabox_page_createAccount .wizard .back').on('click', (e)=> {
+    if(e.currentTarget.parentElement.parentElement.classList.contains('wizard0')){
+      wizardTo(0);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard1')){
+      wizardTo(0);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard2')){
+      wizardTo(1);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard3')){
+      wizardTo(2);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard4')){
+      wizardTo(3);
+    }else if(e.currentTarget.parentElement.parentElement.classList.contains('wizard5')){
+      wizardTo(4);
+    }
+  });
   $('#eosinabox_powerup_gauge svg').on('click', async () => {
     if(gState.gaugeEstimatedNumOfTx < 4){
       if(getCurrentAccountChain() == 'jungle3'){
@@ -256,11 +321,10 @@ $(() => {
       }else{
         const response = await fetch('https://api.eospowerup.io/freePowerup/' + getCurrentAccountName());
         consoleLog({ freepowerup: response });
-        eosinaboxToast('Free PowerUp can be used once every 12 hours');
         setTimeout(()=>{
           updateBalance();
           $('#eosinabox_powerup_gauge svg').css('background-color', 'transparent');
-          eosinaboxToast('Free PowerUp can be used once every 12 hours');
+          eosinaboxToast('Free PowerUp can be used twice every 24 hours');
         }, 5000);
       }
     }
@@ -323,12 +387,12 @@ $(() => {
         // save just the new key, destroy the older ones!
         // localStorage['eosinabox_pubkeys'] = JSON.stringify( [{ credentialId: credentialIdHex, key: data.pubkey }] );
       }
-      checkIfAllConditionsMet();
+      // checkIfAllConditionsMet();
       await consoleLog( data );
     })
     .catch( err => {
       gState.pubkey = false;
-      checkIfAllConditionsMet();
+      // checkIfAllConditionsMet();
       consoleLog(err);
     });
   });
@@ -421,8 +485,8 @@ $(() => {
           data: {
             from: getCurrentAccountName(),
             receiver: getCurrentAccountName(),
-            stake_net_quantity: '0.0010 EOS',
-            stake_cpu_quantity: '0.0010 EOS',
+            stake_net_quantity: '0.0001 EOS',
+            stake_cpu_quantity: '0.0001 EOS',
             transfer: false,
           }
         }]
@@ -602,17 +666,17 @@ $(() => {
     callMyShare(JSON.stringify(localStorage)); // txt? or url
   });
 
-  $('.eosinabox_share_inviteFriend').on('click', (e)=>{
-    gState.shareEssentials = {
-      custodianAccountName: $('.eosinabox_custodianAccountNameInvite').val().toLowerCase(),
-    };
-    const shareInfo = {
-      url: `https://eosinabox.com/#sharedInfo?action=` +
-        `inviteToCreateAccount&chain=${gState.chain}` +
-        `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
-    }
-    callMyShare( shareInfo.url );
-  });
+  // $('.eosinabox_share_inviteFriend').on('click', (e)=>{
+  //   gState.shareEssentials = {
+  //     custodianAccountName: $('.eosinabox_custodianAccountNameInvite').val().toLowerCase(),
+  //   };
+  //   const shareInfo = {
+  //     url: `https://eosinabox.com/#sharedInfo?action=` +
+  //       `inviteToCreateAccount&chain=${gState.chain}` +
+  //       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}`
+  //   }
+  //   callMyShare( shareInfo.url );
+  // });
 
   $('.eosinabox_shareRestore').on('click', (e)=>{
     gState.shareEssentials = {
@@ -642,6 +706,7 @@ $(() => {
       `&custodianAccountName=${gState.shareEssentials.custodianAccountName}&` +
       `pubkey=${gState.shareEssentials.pubkey}`;
     callMyShare(shareTxt);
+    gotoHome();
   });
   $('#eosinabox_transfer_from').on('click', () => {
     $('#eosinabox_transfer_from').html('...');
@@ -743,9 +808,7 @@ $(() => {
       $('#eosinabox_transfer_from').html(localStorage.currentAccount);
     }
   }else{
-    // plain onLoad, go to home page
-    $('.eosinabox_page').hide();
-    $(`.eosinabox_page_myAccount`).show();
-    $('#eosinabox_transfer_from').html(localStorage.currentAccount);
+    gotoHome();
   }
 });
+
