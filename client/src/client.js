@@ -375,7 +375,7 @@ $(() => {
       attestationObject: eosjs_serialize.arrayToHex(new Uint8Array(credential.response.attestationObject)),
       clientDataJSON: eosjs_serialize.arrayToHex(new Uint8Array(credential.response.clientDataJSON)),
     }
-    // // TODO: discuss, perhaps there is no need to do this on the server side, we can do most
+    // // TODO: discuss, perhaps there is no need to do this on the server side, we can do most (ALL?)
     // // of the processing on the front end.
     fetch('/getNewPubKey', {
       method: 'POST',
@@ -386,6 +386,7 @@ $(() => {
     .then(async data => {
       gState.pubkey = true;
       $('#eosinabox_pubkey').html(data.pubkey);
+      $('.eosinabox_pubkeyClass').html(data.pubkey);
       // save in localStorage
       let credentialIdHex = eosjs_serialize.arrayToHex(new Uint8Array(credential.rawId));
       if( !localStorage['eosinabox_pubkeys'] ){
