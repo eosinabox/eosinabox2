@@ -808,8 +808,8 @@ $(() => {
       console.log('o.action::::restoreAccount, o:', o.chain, o.pubkey, o.accountName);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
-      $('.eosinabox_accountNameClassRestoreAccountTransaction').val(o.accountName);
-      $('.eosinabox_pubkeyClassRestoreAccountTransaction').val(o.pubkey);
+      $('.eosinabox_accountNameClassRestoreAccountTransaction').html(o.accountName);
+      $('.eosinabox_pubkeyClassRestoreAccountTransaction').html(o.pubkey);
       // .eosinabox_custodianAccountNameRestoreAccountTransaction
       // .eosinabox_buttonRestoreAccountTransaction
       $('.eosinabox_page').hide();
