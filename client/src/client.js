@@ -228,7 +228,7 @@ $(() => {
       $('#eosinabox_power1').html( `perhaps the custodian` );
       $('#eosinabox_power2').html( `needs to create it for you` );
     }else{
-      $('#eosinabox_balance').html( `${accountInfo.core_liquid_balance} <i class="eosinabox_refresh bi bi-arrow-repeat h2"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h2 text-primary"></i>` );
+      $('#eosinabox_balance').html( `${!!accountInfo.core_liquid_balance ? accountInfo.core_liquid_balance : 0} <i class="eosinabox_refresh bi bi-arrow-repeat h2"></i> <i class="eosinabox_viewOnExplorer bi bi-eye h2 text-primary"></i>` );
       $('#eosinabox_power1').html( `NET available: ${Number.parseFloat(accountInfo.net_limit.available/1024).toFixed(2)} KB` );
       $('#eosinabox_power2').html( `CPU available: ${Number.parseFloat(accountInfo.cpu_limit.available/1000).toFixed(2)} ms` );
       // calc gauge settiings, each simple transaction takes about 250 usec CPU and 250 bytes NET, so take the minimum of these and divide by 250
