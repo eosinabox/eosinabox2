@@ -804,6 +804,8 @@ $(() => {
       $('.eosinabox_page').hide();
       $(`.eosinabox_page_createAccount`).show();
     }else if(o.action == 'restoreAccount'){
+      console.log('o.action::::restoreAccount, o:', o);
+      console.log('o.action::::restoreAccount, o:', o.chain, o.pubkey, o.accountName);
       $('.eosinabox_dropdown_blockchain a.dropdown-item').data('chain', o.chain);
       $('.eosinabox_dropdown_blockchain button').html(o.chain);
       $('.eosinabox_accountNameClassRestoreAccountTransaction').val(o.accountName);
