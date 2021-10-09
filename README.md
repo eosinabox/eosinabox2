@@ -1,3 +1,9 @@
+# github
+
+    https://github.com/eosinabox/eosinabox2
+
+Will probably soonish move to https://github.com/eosinabox/eosinabox
+
 # EOS in a Box
 
 clean(er) version of the web wallet with webauthn tech.
